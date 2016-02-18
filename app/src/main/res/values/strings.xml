@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Pet Phone</string>
-    <string name="action_settings">Settings</string>
+    <string name="light_drop_response">WOW!! YOU DROPPED ME!!!!</string>
 </resources>
