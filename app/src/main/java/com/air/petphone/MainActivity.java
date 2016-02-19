@@ -10,6 +10,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         final TextView t = (TextView) findViewById(R.id.msg1);
         final TextView t2 = (TextView) findViewById(R.id.face);
         if(val[2] > 1.0f || val[2] < -1.0f) {
-            Log.d("TAG", Float.toString(val[2]));
+
 
             TimerTask task = new TimerTask() {
                 @Override
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         @Override
                         public void run() {
                             Log.d("TAG", "MANY COUNT " + eventCounter);
-                            if(eventCounter < 10 ){
+                            if(eventCounter < 20 ){
                                 t.setText(R.string.light_drop_response);
                                 t2.setText(R.string.shocked_face);
                                 sendNotification();
@@ -72,9 +73,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 eventCounter = 1;
                 Timer timer = new Timer("timer1");
                 timer.schedule(task, 3000);
+                Log.d("TAG", Float.toString(val[2]));
+                Log.d("TAG", "1");
             }
             else if (val[2] < -15.0f && eventCounter != -1){
+                Log.d("TAG", Float.toString(val[2]));
                 eventCounter++;
+                Log.d("TAG", "2");
             }
 
 //            if(val[2] < -15.0f && (System.currentTimeMillis()/1000) - now > 3 ){
@@ -94,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onResume() {
         super.onResume();
         mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_GAME);
+        eventCounter = -1;
+        Log.d("TAG", "123123");
     }
 
     @Override
@@ -119,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Notification noti = new Notification.Builder(this)
                 .setContentTitle("YOU DROPPED ME!")
-                .setContentText("WOW" + Float.toString(val[2]))
+                .setContentText("WOW! Shocks:" + eventCounter)
                 .setSmallIcon(R.mipmap.ic_launcher)
 
                 .addAction(R.mipmap.ic_launcher, ":(", p)
@@ -129,6 +136,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .build();
         notificationManager.notify(10, noti);
         now = System.currentTimeMillis()/1000;
+
+        PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
+
+        boolean isScreenOn = pm.isInteractive();
+
+        if(!isScreenOn)
+        {
+            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE |PowerManager.ACQUIRE_CAUSES_WAKEUP, "example");
+            wl.acquire(10000);
+
+        }
     }
 
     public void saySorry(View view){
