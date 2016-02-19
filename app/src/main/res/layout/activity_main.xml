@@ -10,8 +10,32 @@
     tools:context="com.air.petphone.MainActivity">
 
     <TextView
+        android:id="@+id/face"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:textSize="80sp"
+        android:text="@string/happy_face" />
+
+    <TextView
         android:id="@+id/msg1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:layout_above="@id/face"
+        android:layout_centerInParent="true"
+        android:textSize="20sp"
+        android:layout_marginBottom="30dp"
+        android:text="@string/hello"
+        />
+    <Button
+        android:id="@+id/sorryButton"
+        android:layout_width="180dp"
+        android:layout_height="50dp"
+        android:text="@string/sorry"
+        android:layout_below="@id/face"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="30dp"
+        android:onClick="saySorry"
+        />
 </RelativeLayout>
