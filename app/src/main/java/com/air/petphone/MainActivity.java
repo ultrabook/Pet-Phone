@@ -41,6 +41,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
             Log.d("STAT","SUCCESS");
         }
+
+        PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MAINLOCK");
+        wl.acquire();
     }
 
     @Override
@@ -62,8 +66,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                                 t.setText(R.string.light_drop_response);
                                 t2.setText(R.string.shocked_face);
                                 sendNotification();
-                                eventCounter = -1;
                             }
+                            eventCounter = -1;
                         }
                     });
                 }
