@@ -5,4 +5,13 @@
     <string name="shocked_face">O_____O</string>
     <string name="sorry">Sorry :(</string>
     <string name="hello">Hello!</string>
+    <string name="hungry">I’m really hungry please feed me!</string>
+    <string name="hungry_emoji">  =__=  </string>
+    <string name="very_hungry">too weak... cant go on...</string>
+    <string name="very_hungry_emoji"> X__X</string>
+    <string name="fed_and_happy">Hello!</string>
+    <string name="just_bugging"> Just bugging you hehe</string>
+    <string name="bugging_emoji"> XD </string>
+    <string name="yum">Yumm... Took you long enough!</string>
+
 </resources>
