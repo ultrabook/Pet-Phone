@@ -3,12 +3,15 @@ package com.air.petphone;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
@@ -101,13 +104,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_GAME);
         eventCounter = -1;
         Log.d("TAG", "123123");
+        sendNotificationBattery();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        sendNotificationBattery();
         //mSensorManager.unregisterListener(this);
     }
+
+//    @Override
+//    public void onReceive(Context context, Intent intent) {
+//        if(intent.getAction().equals(ACTION_BATTERY_LOW)) {
+//            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+//            Intent batteryStatus = context.registerReceiver(null, ifilter);
+//
+//            int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+//            int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
+//            int percent = (level*100)/scale;
+//
+//            if (percent <= 10 && percent > 5) {
+//                // Do Something
+//            }
+//        }
+//    }
 
     float ALPHA = 0.5f;
 
@@ -118,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         return output;
     }
+
 
     private void sendNotification() {
         Intent intent = new Intent(this, MainActivity.class);
@@ -148,6 +170,102 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         }
     }
+
+
+
+
+    //function to get battery level
+
+    private int getBatteryLevel () {
+        IntentFilter intentFilter  = new IntentFilter( Intent.ACTION_BATTERY_CHANGED );
+        Intent       batteryStatus = registerReceiver(null, intentFilter);
+
+        int level = batteryStatus.getIntExtra( BatteryManager.EXTRA_LEVEL, -1 );
+        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+        return ( int ) ( level * 100 / ( float ) scale );
+    }
+
+
+    //Function to check if phone is plugged in
+
+    //@Override
+    public boolean checkCharge(Intent intent)
+    {
+
+        String action = intent.getAction();
+        boolean result;
+
+        if (action.equals(Intent.ACTION_POWER_CONNECTED))
+        {
+            result = true;
+        } else
+        {
+            result = false;
+        }
+
+        return result;
+    }
+
+
+//    //Alert Builder
+//    new AlertDialog.Builder(context)
+//            .setTitle("Delete entry")
+//    .setMessage("Are you sure you want to delete this entry?")
+//    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//        public void onClick(DialogInterface dialog, int which) {
+//            // continue with delete
+//        }
+//    })
+//            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+//        public void onClick(DialogInterface dialog, int which) {
+//            // do nothing
+//        }
+//    })
+//            .setIcon(android.R.drawable.ic_dialog_alert)
+//    .show();
+
+    //Function to send the battery notification
+
+    private void sendNotificationBattery(){
+
+        int levelPert = getBatteryLevel();
+        final TextView t = (TextView) findViewById(R.id.msg1);
+        final TextView t2 = (TextView) findViewById(R.id.face);
+
+
+        if(levelPert <80 && levelPert > 15)
+        {
+            t.setText(R.string.just_bugging);
+            t2.setText(R.string.bugging_emoji);
+            sendNotification();
+        }
+
+        else if(levelPert <16 && levelPert > 10)
+        {
+            t.setText(R.string.hungry);
+            t2.setText(R.string.hungry_emoji);
+            sendNotification();
+        }
+
+        else if(levelPert <10 && levelPert > 4)
+        {
+            t.setText(R.string.very_hungry);
+            t2.setText(R.string.very_hungry_emoji);
+            sendNotification();
+
+            Intent intent = getIntent();
+            boolean status = checkCharge(intent);
+            if(status)
+            {
+                t.setText(R.string.yum);
+                t2.setText(R.string.happy_face);
+                sendNotification();
+            }
+        }
+
+    }
+
 
     public void saySorry(View view){
         TextView t = (TextView) findViewById(R.id.msg1);
