@@ -27,6 +27,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor mSensor;
     private int eventCounter = -1;
     private Long now = new Long(0);
+    private PowerManager.WakeLock wl;
+
+    private int nu = 0;
 
     protected float[] val;
 
@@ -43,17 +46,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 
         PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MAINLOCK");
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MAINLOCK");
         wl.acquire();
+
+
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification noti = new Notification.Builder(this)
+                .setContentTitle("^____^")
+                .setContentText("I'm Your Pet!")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setOngoing(true)
+                .build();
+        notificationManager.notify(1, noti);
+
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+
         val = lowPass(event.values.clone(), val);
         final TextView t = (TextView) findViewById(R.id.msg1);
         final TextView t2 = (TextView) findViewById(R.id.face);
         if(val[2] > 1.0f || val[2] < -1.0f) {
-
+            Log.d("TAG", Float.toString(val[2]));
 
             TimerTask task = new TimerTask() {
                 @Override
@@ -73,12 +89,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             };
 
+            if(val[2] < -15.0f){
+                nu++;
+            }
+
             if(val[2] < -15.0f && eventCounter == -1){
                 eventCounter = 1;
                 Timer timer = new Timer("timer1");
                 timer.schedule(task, 3000);
-                Log.d("TAG", Float.toString(val[2]));
-                Log.d("TAG", "1");
+
+                Log.d("TAG", "Counter Loaded!!!!!!!");
             }
             else if (val[2] < -15.0f && eventCounter != -1){
                 Log.d("TAG", Float.toString(val[2]));
@@ -96,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        Log.d("TAG", "ACCCCCCCCCCCCCCC ON");
     }
 
     @Override
@@ -108,9 +128,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        wl.acquire();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         //mSensorManager.unregisterListener(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
     }
 
     float ALPHA = 0.5f;
@@ -130,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Notification noti = new Notification.Builder(this)
                 .setContentTitle("YOU DROPPED ME!")
-                .setContentText("WOW! Shocks:" + eventCounter)
+                .setContentText("WOW! Shocks:" + nu)
                 .setSmallIcon(R.mipmap.ic_launcher)
 
                 .addAction(R.mipmap.ic_launcher, ":(", p)
