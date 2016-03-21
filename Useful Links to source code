@@ -9,3 +9,11 @@ http://androidexample.com/Screen_Wake_Sleep_Event_Listner_Service_-_Android_Exam
 
 Tutorial for backgound serivces 
 http://developer.android.com/training/run-background-service/create-service.html
+
+Battery monitoring (charging state and battery levels)
+http://developer.android.com/training/monitoring-device-state/battery-monitoring.html
+
+Screen lock/wake listener code
+http://androidexample.com/Screen_Wake_Sleep_Event_Listner_Service_-_Android_Example/index.php?view=article_discription&aid=91&aaid=115
+
+

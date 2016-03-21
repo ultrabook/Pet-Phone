@@ -5,4 +5,12 @@
     <string name="shocked_face">O_____O</string>
     <string name="sorry">Sorry :(</string>
     <string name="hello">Hello!</string>
+    <string name="battery_below_half">Getting kind of hungry</string>
+    <string name="battery_below_half_face">0_____0""</string>
+    <string name="battery_low">Feed me please</string>
+    <string name="battery_low_face">\@_____@</string>
+    <string name="battery_very_low">Too weak… Need food…</string>
+    <string name="battery_very_low_face">X_____X</string>
+    <string name="battery_charging">Eating eating...</string>
+    <string name="battery_charging_face">^_____^</string>
 </resources>
