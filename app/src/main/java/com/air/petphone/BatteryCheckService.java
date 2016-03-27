@@ -41,6 +41,12 @@ public class BatteryCheckService extends Service {
     }
 
     @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        Log.e("COOLL", "oOUT");
+    }
+
+    @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
@@ -89,7 +95,7 @@ public class BatteryCheckService extends Service {
                 uiMessage = BATTERY_POWER_LOW;
             }
 
-            double batteryThreshold = 0.99;
+            double batteryThreshold = 0.5;
 
             if(batteryLevel < batteryThreshold && !isCharging) {
                 NotificationCenter.sendNotification(BatteryCheckService.this,BatteryCheckService.class,title, detail, "Charging now!");

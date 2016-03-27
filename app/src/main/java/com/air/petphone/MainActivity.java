@@ -2,18 +2,19 @@ package com.air.petphone;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
-import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +27,6 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int eventCounter = -1;
     private PowerManager.WakeLock wl;
     private BroadcastReceiver batteryReceiver;
+    private ServiceConnection mConnection;
 
     private int bounceCount = 0;
 
@@ -53,7 +54,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        List<Sensor> deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null) {
             mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
             Log.d("STAT", "SUCCESS");
@@ -64,15 +64,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         wl.acquire();
 
 
-        //Generate permanent notification
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification noti = new Notification.Builder(this)
-                .setContentTitle("^____^")
-                .setContentText("I'm Your Pet!")
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setOngoing(true)
-                .build();
-        notificationManager.notify(1, noti);
+        mConnection = new ServiceConnection() {
+            public void onServiceConnected(ComponentName className,
+                                           IBinder binder) {
+                ((KillNotificationService.KillBinder) binder).service.startService(new Intent(
+                        MainActivity.this, KillNotificationService.class));
+                //Generate permanent notification
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                Notification noti = new Notification.Builder(MainActivity.this)
+                        .setContentTitle("^____^")
+                        .setContentText("I'm Your Pet!")
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setOngoing(true)
+                        .build();
+                notificationManager.notify(KillNotificationService.NOTIFICATION_ID, noti);
+            }
+
+            public void onServiceDisconnected(ComponentName className) {
+            }
+
+        };
+        bindService(new Intent(MainActivity.this,
+                        KillNotificationService.class), mConnection,
+                Context.BIND_AUTO_CREATE);
+
+
 
         Intent monitorIntent = new Intent(this, BatteryCheckService.class);
         startService(monitorIntent);

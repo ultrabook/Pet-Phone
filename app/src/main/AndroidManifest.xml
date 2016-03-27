@@ -12,6 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <service android:name="com.air.petphone.KillNotificationService"/>
         <service
             android:name="com.air.petphone.BatteryCheckService"
             android:enabled="true"
