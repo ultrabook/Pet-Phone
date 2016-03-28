@@ -2,8 +2,8 @@ package com.air.petphone;
 
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.IBinder;
 
 /**
@@ -11,30 +11,22 @@ import android.os.IBinder;
  */
 public class KillNotificationService extends Service {
 
-    public class KillBinder extends Binder {
-        public final Service service;
-
-        public KillBinder(Service service) {
-            this.service = service;
-        }
-
-    }
-
     public static int NOTIFICATION_ID = 111;
-    private NotificationManager mNM;
-    private final IBinder mBinder = new KillBinder(this);
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_STICKY;
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
-        return mBinder;
+        return null;
     }
+
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return Service.START_STICKY;
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        NotificationManager nManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
+        nManager.cancelAll();
     }
-    @Override
-    public void onCreate() {
-        mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        mNM.cancel(NOTIFICATION_ID);
-    }
+
 }

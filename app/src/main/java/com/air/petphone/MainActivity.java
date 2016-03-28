@@ -3,7 +3,6 @@ package com.air.petphone;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -14,7 +13,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -63,32 +61,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MAINLOCK");
         wl.acquire();
 
-
-        mConnection = new ServiceConnection() {
-            public void onServiceConnected(ComponentName className,
-                                           IBinder binder) {
-                ((KillNotificationService.KillBinder) binder).service.startService(new Intent(
-                        MainActivity.this, KillNotificationService.class));
-                //Generate permanent notification
-                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                Notification noti = new Notification.Builder(MainActivity.this)
-                        .setContentTitle("^____^")
-                        .setContentText("I'm Your Pet!")
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setOngoing(true)
-                        .build();
-                notificationManager.notify(KillNotificationService.NOTIFICATION_ID, noti);
-            }
-
-            public void onServiceDisconnected(ComponentName className) {
-            }
-
-        };
-        bindService(new Intent(MainActivity.this,
-                        KillNotificationService.class), mConnection,
-                Context.BIND_AUTO_CREATE);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification noti = new Notification.Builder(MainActivity.this)
+                .setContentTitle("^____^")
+                .setContentText("I'm Your Pet!")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setOngoing(true)
+                .build();
+        notificationManager.notify(KillNotificationService.NOTIFICATION_ID, noti);
 
 
+        startService(new Intent(this, KillNotificationService.class));
 
         Intent monitorIntent = new Intent(this, BatteryCheckService.class);
         startService(monitorIntent);
@@ -105,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
     }
 
     @Override
@@ -133,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                                 t2.setText(R.string.shocked_face);
                                 //sendNotification("HEY!!", "YOU DROPPED ME!!", ":(");
 
-                                NotificationCenter.sendNotification(c, MainActivity.class, "HEY!!", "YOU DROPPED ME!!", ":(");
+                                NotificationCenter.sendNotification(100, c, MainActivity.class, "HEY!!", "YOU DROPPED ME!!", ":(");
                             }
                             eventCounter = -1;
                         }
@@ -211,11 +195,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancelAll();
-        mSensorManager.unregisterListener(this);
-        Intent monitorIntent = new Intent(this, BatteryCheckService.class);
-        stopService(monitorIntent);
+//        mSensorManager.unregisterListener(this);
+//        Intent monitorIntent = new Intent(this, BatteryCheckService.class);
+//        stopService(monitorIntent);
 
         Log.e("TAG", "DESTORY");
     }
@@ -289,4 +271,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 break;
         }
     }
+
 }
+

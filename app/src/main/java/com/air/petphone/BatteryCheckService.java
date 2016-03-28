@@ -9,6 +9,10 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 /**
  * Created by Randy on 16-03-20.
  */
@@ -24,6 +28,8 @@ public class BatteryCheckService extends Service {
     public static final String BATTERY_POWER_CHARGING = "battery_charging";
     public static final String BATTERY_POWER_OK = "battery_ok";
 
+    private static Integer masterCounter = 3;
+
 
     private LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
 
@@ -31,6 +37,9 @@ public class BatteryCheckService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         if (intent != null && intent.hasExtra(BATTERY_UPDATE)){
+
+            masterCounter++;
+            new CPUCheckAsync().execute();
             new BatteryCheckAsync().execute();
         }
         else {
@@ -43,7 +52,6 @@ public class BatteryCheckService extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        Log.e("COOLL", "oOUT");
     }
 
     @Override
@@ -58,10 +66,25 @@ public class BatteryCheckService extends Service {
         broadcastManager.sendBroadcast(intent);
     }
 
+
+    private class CPUCheckAsync extends AsyncTask<Void,Void,Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            Integer[] cpu = getCpuUsageStatistic();
+            if(cpu[0] + cpu[1] > 75){
+                NotificationCenter.sendNotification(120, BatteryCheckService.this,BatteryCheckService.class,">____<\"\"", "CPU is doing so much work", "Ok");
+            }
+            return null;
+        }
+    }
+
     private class BatteryCheckAsync extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... arg0) {
+
+            if(masterCounter < 3) return null;
+            masterCounter = 0;
 
             String uiMessage = BATTERY_POWER_BELOW_HALF;
 
@@ -98,20 +121,19 @@ public class BatteryCheckService extends Service {
             double batteryThreshold = 0.5;
 
             if(batteryLevel < batteryThreshold && !isCharging) {
-                NotificationCenter.sendNotification(BatteryCheckService.this,BatteryCheckService.class,title, detail, "Charging now!");
+                NotificationCenter.sendNotification(121,BatteryCheckService.this,BatteryCheckService.class,title, detail, "Charging now!");
             }
             else if (batteryLevel < batteryThreshold && isCharging){
-                NotificationCenter.sendNotification(BatteryCheckService.this,BatteryCheckService.class,":D", "Eating eating", "Dismiss");
+                NotificationCenter.sendNotification(121,BatteryCheckService.this,BatteryCheckService.class,":D", "Eating eating", "Dismiss");
                 uiMessage = BATTERY_POWER_CHARGING;
             }
             else if (batteryLevel > batteryThreshold) {
                 uiMessage = BATTERY_POWER_OK;
             }
 
-
-
-
             onPostExecute(uiMessage);
+
+
             return null;
         }
 
@@ -119,5 +141,54 @@ public class BatteryCheckService extends Service {
             BatteryCheckService.this.requireActivityUpdate(message);
             BatteryCheckService.this.stopSelf();
         }
+    }
+
+    private Integer[] getCpuUsageStatistic() {
+
+        String tempString = executeTop();
+
+        tempString = tempString.replaceAll(",", "");
+        tempString = tempString.replaceAll("User", "");
+        tempString = tempString.replaceAll("System", "");
+        tempString = tempString.replaceAll("IOW", "");
+        tempString = tempString.replaceAll("IRQ", "");
+        tempString = tempString.replaceAll("%", "");
+        for (int i = 0; i < 10; i++) {
+            tempString = tempString.replaceAll("  ", " ");
+        }
+        tempString = tempString.trim();
+        String[] myString = tempString.split(" ");
+        Integer[] cpuUsageAsInt = new Integer[myString.length];
+        for (int i = 0; i < myString.length; i++) {
+            myString[i] = myString[i].trim();
+            cpuUsageAsInt[i] = Integer.parseInt(myString[i]);
+        }
+        return cpuUsageAsInt;
+    }
+
+    private String executeTop() {
+        java.lang.Process p = null;
+        BufferedReader in = null;
+        String returnString = null;
+        try {
+            p = Runtime.getRuntime().exec("top -n 1");
+            in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            while (returnString == null || returnString.contentEquals("")) {
+                returnString = in.readLine();
+            }
+        } catch (IOException e) {
+            Log.e("executeTop", "error in getting first line of top");
+            e.printStackTrace();
+        } finally {
+            try {
+                in.close();
+                p.destroy();
+            } catch (IOException e) {
+                Log.e("executeTop",
+                        "error in closing and destroying top process");
+                e.printStackTrace();
+            }
+        }
+        return returnString;
     }
 }

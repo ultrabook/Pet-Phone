@@ -16,7 +16,7 @@ public final class NotificationCenter {
         throw new AssertionError();
     }
 
-    public static void sendNotification(Context context, Class passedClass, String title, String text, String buttonText){
+    public static void sendNotification(int ID, Context context, Class passedClass, String title, String text, String buttonText){
         Intent intent = new Intent(context, passedClass);
 
         PendingIntent p = PendingIntent.getActivity(context, 0, intent, 0);
@@ -30,7 +30,7 @@ public final class NotificationCenter {
                 .setVibrate(new long[]{0, 1000, 100, 1000, 100, 1000, 100})
                 .setDefaults(Notification.DEFAULT_SOUND)
                 .build();
-        notificationManager.notify(10, noti);
+        notificationManager.notify(ID, noti);
 
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 
