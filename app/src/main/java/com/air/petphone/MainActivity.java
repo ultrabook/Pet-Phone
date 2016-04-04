@@ -13,6 +13,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +26,13 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -138,7 +146,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             } else if (val[2] < -15.0f && eventCounter != -1) {
                // Log.d("TAG", Float.toString(val[2]));
                 eventCounter++;
-               // Log.d("TAG", "2");
+                Log.i("Counter", "Number of times dropped: " + eventCounter);
+
+                String[] cur_day = get_day();
+                String payload = cur_day[0]+": is "+eventCounter;
+                generateNoteOnSD(getApplicationContext(), "Drop-count-"+(cur_day[1]+".txt"), "number of times dropped on "+ payload);
+
+
+                // Log.d("TAG", "2");
             }
 
 //            if(val[2] < -15.0f && (System.currentTimeMillis()/1000) - now > 3 ){
@@ -272,5 +287,71 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+
+    public void generateNoteOnSD(Context context, String sFileName, String sBody) {
+        try {
+            String state = Environment.getExternalStorageState();
+            Toast.makeText(getApplicationContext(),"State is " + state, Toast.LENGTH_LONG).show();
+
+            boolean mExternalStorageAvailable = false;
+            boolean mExternalStorageWriteable = false;
+
+            if (Environment.MEDIA_MOUNTED.equals(state)){
+                //We can read and write the media
+                mExternalStorageAvailable = mExternalStorageWriteable = true;
+                Toast.makeText(getApplicationContext(), "We Can Read And Write ", Toast.LENGTH_LONG).show();
+//                File file = new File(Environment.getExternalStorageDirectory()
+//                        +File.separator
+//                        +"studentrecords"); //folder name
+//                file.mkdir();
+            } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)){
+                mExternalStorageAvailable = true;
+                mExternalStorageWriteable = false;
+                Toast.makeText(getApplicationContext(), "We Can Read but Not Write ", Toast.LENGTH_LONG).show();
+            }else{
+                //something else is wrong
+                mExternalStorageAvailable = mExternalStorageWriteable = false;
+                Toast.makeText(getApplicationContext(), "We Can't Read OR Write ", Toast.LENGTH_LONG).show();
+            }
+
+            File root = new File(Environment.getExternalStorageDirectory(), "Pet-phone-logs");
+            if (!root.exists()) {
+                root.mkdirs();
+            }
+            File gpxfile = new File(root, sFileName);
+            FileWriter writer = new FileWriter(gpxfile,true);
+            writer.append(sBody);
+            writer.flush();
+            writer.close();
+            Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String[] get_day ()
+    {
+       //array to hold two types of dates
+        String[] reportDate = new String[2];
+
+        // Create an instance of SimpleDateFormat used for formatting
+        // the string representation of date (month/day/year)
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
+        // Get the date today using Calendar object.
+        Date today1 = Calendar.getInstance().getTime();
+        // Using DateFormat format method we can create a string
+        // representation of a date with the defined format.
+
+        reportDate[0] = df.format(today1);
+
+        DateFormat df2 = new SimpleDateFormat("MM-dd-yyyy");
+        Date today2 = Calendar.getInstance().getTime();
+        reportDate[1] = df2.format(today2);
+
+
+
+        return reportDate;
+    }
 }
 
