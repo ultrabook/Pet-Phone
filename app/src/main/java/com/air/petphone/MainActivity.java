@@ -13,6 +13,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +26,13 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -138,7 +146,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             } else if (val[2] < -15.0f && eventCounter != -1) {
                // Log.d("TAG", Float.toString(val[2]));
                 eventCounter++;
-               // Log.d("TAG", "2");
+                Log.i("Counter", "Number of times dropped: " + eventCounter);
+
+                String cur_day = get_day();
+                generateNoteOnSD(getApplicationContext(), "Drop count", "number of times dropped"+(cur_day+eventCounter));
+
+
+                // Log.d("TAG", "2");
             }
 
 //            if(val[2] < -15.0f && (System.currentTimeMillis()/1000) - now > 3 ){
@@ -272,5 +286,36 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+
+    public void generateNoteOnSD(Context context, String sFileName, String sBody) {
+        try {
+            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
+            if (!root.exists()) {
+                root.mkdirs();
+            }
+            File gpxfile = new File(root, sFileName);
+            FileWriter writer = new FileWriter(gpxfile);
+            writer.append(sBody);
+            writer.flush();
+            writer.close();
+            Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String get_day ()
+    {
+        // Create an instance of SimpleDateFormat used for formatting
+        // the string representation of date (month/day/year)
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
+        // Get the date today using Calendar object.
+        Date today = Calendar.getInstance().getTime();
+        // Using DateFormat format method we can create a string
+        // representation of a date with the defined format.
+        String reportDate = df.format(today);
+        return reportDate;
+    }
 }
 

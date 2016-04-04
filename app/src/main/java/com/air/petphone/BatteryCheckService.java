@@ -12,6 +12,13 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
+import static java.util.GregorianCalendar.*;
 
 /**
  * Created by Randy on 16-03-20.
@@ -63,6 +70,7 @@ public class BatteryCheckService extends Service {
         Intent intent = new Intent(BATTERY_UI_UPDATE);
         if(message != null)
             intent.putExtra(BATTERY_UI_MESSAGE, message);
+            Log.i("Date"+DateFormat.getDateTimeInstance(), "Battery Message: "+ message);
         broadcastManager.sendBroadcast(intent);
     }
 
@@ -72,6 +80,8 @@ public class BatteryCheckService extends Service {
         protected Void doInBackground(Void... params) {
             Integer[] cpu = getCpuUsageStatistic();
             if(cpu[0] + cpu[1] > 75){
+                Integer cpu_f = cpu[0]+cpu[1];
+                Log.i("Date"+DateFormat.getDateTimeInstance(), "CPU Message: "+ cpu_f);
                 NotificationCenter.sendNotification(120, BatteryCheckService.this,BatteryCheckService.class,">____<\"\"", "CPU is doing so much work", "Ok");
             }
             return null;
@@ -96,11 +106,14 @@ public class BatteryCheckService extends Service {
             boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
                     status == BatteryManager.BATTERY_STATUS_FULL;
             Log.i("BatteryInfo", "Battery is charging: " + isCharging);
+            Log.i("Date"+DateFormat.getDateTimeInstance(), "Battery charging: "+ isCharging);
+
 
             int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
             int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
             Log.i("BatteryInfo", "level: " + level +" scale: " + scale);
             Log.i("BatteryInfo", "Battery charge level: " + (level / (float)scale));
+            Log.i("Date"+DateFormat.getDateTimeInstance(), "Battery charge level: "+ (level / (float)scale));
 
             float batteryLevel = (level / (float)scale);
 
