@@ -148,8 +148,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 eventCounter++;
                 Log.i("Counter", "Number of times dropped: " + eventCounter);
 
-                String cur_day = get_day();
-                generateNoteOnSD(getApplicationContext(), "Drop count", "number of times dropped"+(cur_day+eventCounter));
+                String[] cur_day = get_day();
+                String payload = cur_day[0]+": is "+eventCounter;
+                generateNoteOnSD(getApplicationContext(), "Drop-count-"+(cur_day[1]+".txt"), "number of times dropped on "+ payload);
 
 
                 // Log.d("TAG", "2");
@@ -289,7 +290,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void generateNoteOnSD(Context context, String sFileName, String sBody) {
         try {
-            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
+            String state = Environment.getExternalStorageState();
+            Toast.makeText(getApplicationContext(),"State is " + state, Toast.LENGTH_LONG).show();
+
+            boolean mExternalStorageAvailable = false;
+            boolean mExternalStorageWriteable = false;
+
+            if (Environment.MEDIA_MOUNTED.equals(state)){
+                //We can read and write the media
+                mExternalStorageAvailable = mExternalStorageWriteable = true;
+                Toast.makeText(getApplicationContext(), "We Can Read And Write ", Toast.LENGTH_LONG).show();
+//                File file = new File(Environment.getExternalStorageDirectory()
+//                        +File.separator
+//                        +"studentrecords"); //folder name
+//                file.mkdir();
+            } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)){
+                mExternalStorageAvailable = true;
+                mExternalStorageWriteable = false;
+                Toast.makeText(getApplicationContext(), "We Can Read but Not Write ", Toast.LENGTH_LONG).show();
+            }else{
+                //something else is wrong
+                mExternalStorageAvailable = mExternalStorageWriteable = false;
+                Toast.makeText(getApplicationContext(), "We Can't Read OR Write ", Toast.LENGTH_LONG).show();
+            }
+
+            File root = new File(Environment.getExternalStorageDirectory(), "Pet-phone-logs");
             if (!root.exists()) {
                 root.mkdirs();
             }
@@ -304,17 +329,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    private String get_day ()
+    private String[] get_day ()
     {
+       //array to hold two types of dates
+        String[] reportDate = new String[2];
+
         // Create an instance of SimpleDateFormat used for formatting
         // the string representation of date (month/day/year)
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
         // Get the date today using Calendar object.
-        Date today = Calendar.getInstance().getTime();
+        Date today1 = Calendar.getInstance().getTime();
         // Using DateFormat format method we can create a string
         // representation of a date with the defined format.
-        String reportDate = df.format(today);
+
+        reportDate[0] = df.format(today1);
+
+        DateFormat df2 = new SimpleDateFormat("MM-dd-yyyy");
+        Date today2 = Calendar.getInstance().getTime();
+        reportDate[1] = df2.format(today2);
+
+
+
         return reportDate;
     }
 }
