@@ -319,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 root.mkdirs();
             }
             File gpxfile = new File(root, sFileName);
-            FileWriter writer = new FileWriter(gpxfile);
+            FileWriter writer = new FileWriter(gpxfile,true);
             writer.append(sBody);
             writer.flush();
             writer.close();
