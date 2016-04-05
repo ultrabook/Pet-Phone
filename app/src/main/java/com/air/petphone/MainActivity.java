@@ -89,6 +89,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             public void onReceive(Context context, Intent intent) {
                 String message = intent.getStringExtra(BatteryCheckService.BATTERY_UI_MESSAGE);
                 batteryLevelFaceDisplay(message);
+
+                //log that the battery message has been sent in a txt
+                //log the bounce count in logcat
+                Log.i("Battery", "Battery Message: " +message);
+
+                //retrieve the date and create the payload of the data
+                String[] cur_day = get_day();
+                String payload = cur_day[0]+" is: "+message;
+                //write the data to the txt of that day
+                generateNoteOnSD(getApplicationContext(), "Battery-message-" + (cur_day[1] + ".txt"), "Battery message on " + (payload + "\r\n"));
+
                 Log.e("TAG", message);
             }
         };
@@ -122,10 +133,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             Log.d("TAG", "MANY COUNT " + eventCounter);
                             if (eventCounter < 20) {
                                 t.setText(R.string.light_drop_response);
-                                t2.setText(R.string.shocked_face);
+                                int unic = 0x1F613;
+                                String face =  getEmijoByUnicode(unic);
+                                t2.setText(face);
+
+                               // t2.setText(R.string.shocked_face);
                                 //sendNotification("HEY!!", "YOU DROPPED ME!!", ":(");
 
                                 NotificationCenter.sendNotification(100, c, MainActivity.class, "HEY!!", "YOU DROPPED ME!!", ":(");
+                                //log the bounce count in logcat
+                                Log.i("Counter", "Number of times dropped: " + bounceCount);
+                                //retrieve the date and create the payload of the data
+                                String[] cur_day = get_day();
+                                String payload = cur_day[0]+": is "+bounceCount;
+                                //write the data to the txt of that day
+                                generateNoteOnSD(getApplicationContext(), "Drop-count-" + (cur_day[1] + ".txt"), "number of times dropped on " + (payload + "\r\n"));
                             }
                             eventCounter = -1;
                         }
@@ -135,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             if (val[2] < -15.0f) {
                 bounceCount++;
+
             }
 
             if (val[2] < -15.0f && eventCounter == -1) {
@@ -146,11 +169,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             } else if (val[2] < -15.0f && eventCounter != -1) {
                // Log.d("TAG", Float.toString(val[2]));
                 eventCounter++;
-                Log.i("Counter", "Number of times dropped: " + eventCounter);
-
-                String[] cur_day = get_day();
-                String payload = cur_day[0]+": is "+eventCounter;
-                generateNoteOnSD(getApplicationContext(), "Drop-count-"+(cur_day[1]+".txt"), "number of times dropped on "+ payload);
 
 
                 // Log.d("TAG", "2");
@@ -233,7 +251,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         TextView t2 = (TextView) findViewById(R.id.face);
 
         t1.setText(R.string.hello);
-        t2.setText(R.string.happy_face);
+        int unic = 0x1F601;
+        String face =  getEmijoByUnicode(unic);
+        t2.setText(face);
+
+        //t2.setText(R.string.happy_face);
 
         Toast.makeText(getApplicationContext(), "You better be sorry >__<", Toast.LENGTH_SHORT).show();
     }
@@ -262,27 +284,45 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void batteryLevelFaceDisplay(String input){
         TextView t1 = (TextView) findViewById(R.id.msg1);
         TextView t2 = (TextView) findViewById(R.id.face);
-
+        String face ="";
+        int unic;
         switch (input){
             case BatteryCheckService.BATTERY_POWER_BELOW_HALF:
                 t1.setText(R.string.battery_below_half);
-                t2.setText(R.string.battery_below_half_face);
+                unic = 0x1F610;
+                face =  getEmijoByUnicode(unic);
+                t2.setText(face);
+                //t2.setText(R.string.battery_below_half_face);
+
                 break;
             case BatteryCheckService.BATTERY_POWER_LOW:
                 t1.setText(R.string.battery_low);
-                t2.setText(R.string.battery_low_face);
+                unic = 0x1F635;
+                face =  getEmijoByUnicode(unic);
+                t2.setText(face);
+                //t2.setText(R.string.battery_low_face);
                 break;
             case BatteryCheckService.BATTERY_POWER_VERY_LOW:
                 t1.setText(R.string.battery_very_low);
-                t2.setText(R.string.battery_very_low_face);
+                unic = 0x1F616;
+                face =  getEmijoByUnicode(unic);
+                t2.setText(face);
+                //t2.setText(R.string.battery_very_low_face);
                 break;
             case BatteryCheckService.BATTERY_POWER_CHARGING:
                 t1.setText(R.string.battery_charging);
-                t2.setText(R.string.battery_charging_face);
+                unic = 0x1F60F;
+                face =  getEmijoByUnicode(unic);
+                t2.setText(face);
+                //t2.setText(R.string.battery_charging_face);
                 break;
             default:
                 t1.setText(R.string.hello);
-                t2.setText(R.string.happy_face);
+                //standard smiling face
+                unic = 0x1F601;
+                face =  getEmijoByUnicode(unic);
+                t2.setText(face);
+               // t2.setText(R.string.happy_face);
                 break;
         }
     }
@@ -290,29 +330,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void generateNoteOnSD(Context context, String sFileName, String sBody) {
         try {
-            String state = Environment.getExternalStorageState();
-            Toast.makeText(getApplicationContext(),"State is " + state, Toast.LENGTH_LONG).show();
+ //           String state = Environment.getExternalStorageState();
+//            Toast.makeText(getApplicationContext(),"State is " + state, Toast.LENGTH_LONG).show();
 
-            boolean mExternalStorageAvailable = false;
-            boolean mExternalStorageWriteable = false;
-
-            if (Environment.MEDIA_MOUNTED.equals(state)){
-                //We can read and write the media
-                mExternalStorageAvailable = mExternalStorageWriteable = true;
-                Toast.makeText(getApplicationContext(), "We Can Read And Write ", Toast.LENGTH_LONG).show();
-//                File file = new File(Environment.getExternalStorageDirectory()
-//                        +File.separator
-//                        +"studentrecords"); //folder name
-//                file.mkdir();
-            } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)){
-                mExternalStorageAvailable = true;
-                mExternalStorageWriteable = false;
-                Toast.makeText(getApplicationContext(), "We Can Read but Not Write ", Toast.LENGTH_LONG).show();
-            }else{
-                //something else is wrong
-                mExternalStorageAvailable = mExternalStorageWriteable = false;
-                Toast.makeText(getApplicationContext(), "We Can't Read OR Write ", Toast.LENGTH_LONG).show();
-            }
+//            boolean mExternalStorageAvailable = false;
+//            boolean mExternalStorageWriteable = false;
+//
+//            if (Environment.MEDIA_MOUNTED.equals(state)){
+//                //We can read and write the media
+//                mExternalStorageAvailable = mExternalStorageWriteable = true;
+//                Toast.makeText(getApplicationContext(), "We Can Read And Write ", Toast.LENGTH_LONG).show();
+//
+//            } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)){
+//                mExternalStorageAvailable = true;
+//                mExternalStorageWriteable = false;
+//                Toast.makeText(getApplicationContext(), "We Can Read but Not Write ", Toast.LENGTH_LONG).show();
+//            }else{
+//                //something else is wrong
+//                mExternalStorageAvailable = mExternalStorageWriteable = false;
+//                Toast.makeText(getApplicationContext(), "We Can't Read OR Write ", Toast.LENGTH_LONG).show();
+//            }
 
             File root = new File(Environment.getExternalStorageDirectory(), "Pet-phone-logs");
             if (!root.exists()) {
@@ -323,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             writer.append(sBody);
             writer.flush();
             writer.close();
-            Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+//          Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -353,5 +390,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         return reportDate;
     }
+
+    //function to get the unicode emojis
+    public String getEmijoByUnicode(int unicode)
+    {
+        return new String(Character.toChars(unicode));
+    }
+
 }
 
