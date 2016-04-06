@@ -68,7 +68,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         wl.acquire();
 
 
-
+        int unic = 0x1F601;
+        String face =  getEmijoByUnicode(unic);
+        TextView t2 = (TextView) findViewById(R.id.face);
+        t2.setText(face);
 
         startService(new Intent(this, KillNotificationService.class));
 
@@ -321,26 +324,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void generateNoteOnSD(Context context, String sFileName, String sBody) {
         try {
- //           String state = Environment.getExternalStorageState();
-//            Toast.makeText(getApplicationContext(),"State is " + state, Toast.LENGTH_LONG).show();
-
-//            boolean mExternalStorageAvailable = false;
-//            boolean mExternalStorageWriteable = false;
-//
-//            if (Environment.MEDIA_MOUNTED.equals(state)){
-//                //We can read and write the media
-//                mExternalStorageAvailable = mExternalStorageWriteable = true;
-//                Toast.makeText(getApplicationContext(), "We Can Read And Write ", Toast.LENGTH_LONG).show();
-//
-//            } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)){
-//                mExternalStorageAvailable = true;
-//                mExternalStorageWriteable = false;
-//                Toast.makeText(getApplicationContext(), "We Can Read but Not Write ", Toast.LENGTH_LONG).show();
-//            }else{
-//                //something else is wrong
-//                mExternalStorageAvailable = mExternalStorageWriteable = false;
-//                Toast.makeText(getApplicationContext(), "We Can't Read OR Write ", Toast.LENGTH_LONG).show();
-//            }
 
             File root = new File(Environment.getExternalStorageDirectory(), "Pet-phone-logs");
             if (!root.exists()) {
@@ -351,7 +334,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             writer.append(sBody);
             writer.flush();
             writer.close();
-//          Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
         }
