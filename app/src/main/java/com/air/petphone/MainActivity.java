@@ -1,7 +1,5 @@
 package com.air.petphone;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -69,14 +67,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MAINLOCK");
         wl.acquire();
 
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification noti = new Notification.Builder(MainActivity.this)
-                .setContentTitle("^____^")
-                .setContentText("I'm Your Pet!")
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setOngoing(true)
-                .build();
-        notificationManager.notify(KillNotificationService.NOTIFICATION_ID, noti);
+
 
 
         startService(new Intent(this, KillNotificationService.class));
