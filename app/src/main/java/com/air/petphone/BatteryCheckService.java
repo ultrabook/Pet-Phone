@@ -30,7 +30,7 @@ public class BatteryCheckService extends Service {
     public static final String BATTERY_POWER_CHARGING = "battery_charging";
     public static final String BATTERY_POWER_OK = "battery_ok";
 
-    private static Integer masterCounter = 3;
+    private static Integer masterCounter = 10;
 
     Intent updateUIIntent;
     private final Handler handler = new Handler();
@@ -48,8 +48,8 @@ public class BatteryCheckService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        if (intent != null && intent.hasExtra(BATTERY_UPDATE)){
 
+        if (intent != null && intent.hasExtra(BATTERY_UPDATE)){
             masterCounter++;
             new CPUCheckAsync().execute();
             new BatteryCheckAsync().execute();
@@ -96,8 +96,8 @@ public class BatteryCheckService extends Service {
             Integer[] cpu = getCpuUsageStatistic();
             if(cpu[0] + cpu[1] > 40){
                 Integer cpu_f = cpu[0]+cpu[1];
-                Log.i("Date"+DateFormat.getDateTimeInstance(), "CPU Message: "+ cpu_f);
-                NotificationCenter.sendNotification(120, BatteryCheckService.this,MainActivity.class,">____<\"\"", "CPU is doing work", "Ok");
+                Log.i("CPU", "CPU Message: "+ cpu_f);
+                if(masterCounter >= 15) NotificationCenter.sendNotification(120, BatteryCheckService.this,MainActivity.class,">____<\"\"", "CPU is doing work", "Ok");
             }
             return null;
         }
@@ -108,8 +108,8 @@ public class BatteryCheckService extends Service {
         @Override
         protected Void doInBackground(Void... arg0) {
 
-            if(masterCounter < 3) return null;
-            masterCounter = 0;
+//            if(masterCounter < 3) return null;
+//            masterCounter = 0;
 
             String uiMessage = BATTERY_POWER_BELOW_HALF;
 
@@ -148,10 +148,16 @@ public class BatteryCheckService extends Service {
             double batteryThreshold = 0.5;
 
             if(batteryLevel < batteryThreshold && !isCharging) {
-                NotificationCenter.sendNotification(121,BatteryCheckService.this,MainActivity.class,title, detail, "Charging now!");
+                if(masterCounter >= 10) {
+                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, title, detail, "Charging now!");
+                    masterCounter = 0;
+                }
             }
             else if (batteryLevel < batteryThreshold && isCharging){
-                NotificationCenter.sendNotification(121,BatteryCheckService.this,MainActivity.class,":D", "Eating eating", "Great!");
+                if(masterCounter >= 10) {
+                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, ":D", "Eating eating", "Great!");
+                    masterCounter = 0;
+                }
                 uiMessage = BATTERY_POWER_CHARGING;
             }
             else if (batteryLevel > batteryThreshold) {

@@ -84,11 +84,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if (action.equals(Intent.ACTION_POWER_CONNECTED)) {
                 Log.i("Plug", "plugged");
                 NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Food Time!", "Enjoy!");
+                batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_CHARGING);
             }
 
             if (action.equals(Intent.ACTION_POWER_DISCONNECTED)) {
                 Log.i("Plug", "unplugged");
                 NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "T____T", "No more food", "Sorry! Next time!");
+                batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_OK);
+
             }
         }
     };
