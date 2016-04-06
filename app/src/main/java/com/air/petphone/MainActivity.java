@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor mSensor;
     private int eventCounter = -1;
     private PowerManager.WakeLock wl;
+    private String currentBatteryMessage = BatteryCheckService.BATTERY_POWER_OK;
     private BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -156,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             Log.d("TAG", "MANY COUNT " + eventCounter);
                             if (eventCounter < 20) {
                                 setFaceAndMessage(light_drop_face, getString(R.string.light_drop_response));
-                                setButtonVisibility(View.INVISIBLE, View.INVISIBLE, View.VISIBLE);
+                                setButtonVisibility(View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
 
                                 NotificationCenter.sendNotification(100, c, MainActivity.class, "HEY!!", "YOU DROPPED ME!!", ":(");
                                 //log the bounce count in logcat
@@ -266,7 +267,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Toast.makeText(getApplicationContext(), "You better be sorry >__<", Toast.LENGTH_SHORT).show();
 
         //null is no change
-        setButtonVisibility(View.VISIBLE, null, View.INVISIBLE);
+        setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE);
+
+        batteryLevelFaceDisplay(currentBatteryMessage);
 
     }
 
@@ -307,6 +310,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void batteryLevelFaceDisplay(String input) {
 
+        currentBatteryMessage = input;
         switch (input) {
             case BatteryCheckService.BATTERY_POWER_BELOW_HALF:
                 setFaceAndMessage(below_half_battery_face, getString(R.string.battery_below_half));
