@@ -48,17 +48,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             //log that the battery message has been sent in a txt
             //log the bounce count in logcat
-            Log.i("BatteryReceive", "Battery Message: " +message);
+            Log.i("BatteryReceive", "Battery Message: " + message);
 
             //retrieve the date and create the payload of the data
             String[] cur_day = get_day();
-            String payload = cur_day[0]+" battery: "+message;
+            String payload = cur_day[0] + " battery: " + message;
             //write the data to the txt of that day
-            generateNoteOnSD(getApplicationContext(), "Battery-message-" + (cur_day[1] + ".txt"),payload + "\r\n");
+            generateNoteOnSD(getApplicationContext(), "Battery-message-" + (cur_day[1] + ".txt"), payload + "\r\n");
 
             Log.e("TAG", message);
         }
-    };;
+    };
+
+    private BroadcastReceiver screenReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(Intent.ACTION_USER_PRESENT)) {
+                Log.i("Screen", "UNLOCKED");
+                String[] cur_day = get_day();
+                String payload = cur_day[0] + " Unlocked ";
+                generateNoteOnSD(getApplicationContext(), "Phone-Lock-" + (cur_day[1] + ".txt"), payload + "\r\n");
+            }
+        }
+    };
 
     private static final int helloFace = 0x1F601;
     private static final int low_battery_face = 0x1F635;
@@ -109,10 +123,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE);
 
-
         registerReceiver(batteryReceiver,
                 new IntentFilter(BatteryCheckService.BATTERY_UI_UPDATE)
         );
+
+        registerReceiver(screenReceiver, new IntentFilter(Intent.ACTION_USER_PRESENT));
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -130,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         final Context c = this;
         val = lowPass(event.values.clone(), val);
         if (val[2] > 1.0f || val[2] < -1.0f) {
-           // Log.d("TAG", Float.toString(val[2]));
+            // Log.d("TAG", Float.toString(val[2]));
 
             TimerTask task = new TimerTask() {
                 @Override
@@ -148,9 +163,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                                 Log.i("Counter", "Bounce count: " + bounceCount);
                                 //retrieve the date and create the payload of the data
                                 String[] cur_day = get_day();
-                                String payload = cur_day[0]+" bounced: "+bounceCount;
+                                String payload = cur_day[0] + " bounced: " + bounceCount;
                                 //write the data to the txt of that day
-                                generateNoteOnSD(getApplicationContext(), "Drop-count-" + (cur_day[1] + ".txt"),payload + "\r\n");
+                                generateNoteOnSD(getApplicationContext(), "Drop-count-" + (cur_day[1] + ".txt"), payload + "\r\n");
                             }
                             eventCounter = -1;
                         }
@@ -170,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
                 Log.d("Counter", "Counter Loaded");
             } else if (val[2] < -15.0f && eventCounter != -1) {
-               // Log.d("TAG", Float.toString(val[2]));
+                // Log.d("TAG", Float.toString(val[2]));
                 eventCounter++;
 
 
@@ -187,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onBackPressed() {
-        Toast.makeText(this,"Use home button instead", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Use home button instead", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -290,9 +305,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         client.disconnect();
     }
 
-    public void batteryLevelFaceDisplay(String input){
+    public void batteryLevelFaceDisplay(String input) {
 
-        switch (input){
+        switch (input) {
             case BatteryCheckService.BATTERY_POWER_BELOW_HALF:
                 setFaceAndMessage(below_half_battery_face, getString(R.string.battery_below_half));
                 //remove the greeting button
@@ -339,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 root.mkdirs();
             }
             File gpxfile = new File(root, sFileName);
-            FileWriter writer = new FileWriter(gpxfile,true);
+            FileWriter writer = new FileWriter(gpxfile, true);
             writer.append(sBody);
             writer.flush();
             writer.close();
@@ -348,9 +363,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    private String[] get_day ()
-    {
-       //array to hold two types of dates
+    private String[] get_day() {
+        //array to hold two types of dates
         String[] reportDate = new String[2];
 
         // Create an instance of SimpleDateFormat used for formatting
@@ -369,17 +383,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         reportDate[1] = df2.format(today2);
 
 
-
         return reportDate;
     }
 
     //function to get the unicode emojis
-    public String getEmijoByUnicode(int unicode)
-    {
+    public String getEmijoByUnicode(int unicode) {
         return new String(Character.toChars(unicode));
     }
 
-    private void setFaceAndMessage(int faceUnicode, String message){
+    private void setFaceAndMessage(int faceUnicode, String message) {
         TextView t1 = (TextView) findViewById(R.id.msg1);
         TextView t2 = (TextView) findViewById(R.id.face);
 
@@ -391,18 +403,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private void setButtonVisibility(Integer hi, Integer sorry, Integer eating) {
 
-        Button btnSorry = (Button)findViewById(R.id.sorryButton);
-        Button btnHi = (Button)findViewById(R.id.hiButton);
-        Button btnEating = (Button)findViewById(R.id.eatingButton);
+        Button btnSorry = (Button) findViewById(R.id.sorryButton);
+        Button btnHi = (Button) findViewById(R.id.hiButton);
+        Button btnEating = (Button) findViewById(R.id.eatingButton);
 
 
         //set visibility if not null
         //greeting button
-        if(hi != null) btnHi.setVisibility(hi);
+        if (hi != null) btnHi.setVisibility(hi);
         //sorry button
-        if(sorry != null) btnSorry.setVisibility(sorry);
+        if (sorry != null) btnSorry.setVisibility(sorry);
         //eating button
-        if(eating != null) btnEating.setVisibility(eating);
+        if (eating != null) btnEating.setVisibility(eating);
     }
 
 }
