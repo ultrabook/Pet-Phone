@@ -71,6 +71,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 String[] cur_day = get_day();
                 String payload = cur_day[0] + " Unlocked ";
                 generateNoteOnSD(getApplicationContext(), "Phone-Lock-" + (cur_day[1] + ".txt"), payload + "\r\n");
+                NotificationCenter.sendNotification(131, MainActivity.this, MainActivity.class, ">___>", "You look at me too much", "Sorry!");
+            }
+        }
+    };
+
+    private BroadcastReceiver plugReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(Intent.ACTION_POWER_CONNECTED)) {
+                Log.i("Plug", "plugged");
+                NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Food Time!", "Enjoy!");
+            }
+
+            if (action.equals(Intent.ACTION_POWER_DISCONNECTED)) {
+                Log.i("Plug", "unplugged");
+                NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "T____T", "No more food", "Sorry! Next time!");
             }
         }
     };
@@ -124,11 +142,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE);
 
-        registerReceiver(batteryReceiver,
-                new IntentFilter(BatteryCheckService.BATTERY_UI_UPDATE)
-        );
-
+        registerReceiver(batteryReceiver,new IntentFilter(BatteryCheckService.BATTERY_UI_UPDATE));
         registerReceiver(screenReceiver, new IntentFilter(Intent.ACTION_USER_PRESENT));
+        IntentFilter filter = new IntentFilter(Intent.ACTION_POWER_CONNECTED);
+        filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+        registerReceiver(plugReceiver, filter);
+
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
