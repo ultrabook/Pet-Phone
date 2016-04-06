@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -42,7 +41,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int eventCounter = -1;
     private PowerManager.WakeLock wl;
     private BroadcastReceiver batteryReceiver;
-    private ServiceConnection mConnection;
+
+    private static final int helloFace = 0x1F601;
+    private static final int low_battery_face = 0x1F635;
+    private static final int very_low_battery_face = 0x1F616;
+    private static final int below_half_battery_face = 0x1F610;
+    private static final int battery_charging_face = 0x1F60F;
+    private static final int light_drop_face = 0x1F613;
+    private static final int eating_face = 0x1F60B;
+
 
     private int bounceCount = 0;
 
@@ -57,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.e("TAG", "onCREATE");
 
         //I want to insert the conditional statement here and crate two xml-s basically one owuld be to say sorry, and one wold be to say hi.
         //The xml to display will be based on whether any events are trigegred.
@@ -73,11 +82,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MAINLOCK");
         wl.acquire();
 
-
-        int unic = 0x1F601;
-        String face =  getEmijoByUnicode(unic);
-        TextView t2 = (TextView) findViewById(R.id.face);
-        t2.setText(face);
+        setFaceAndMessage(helloFace, "Hello");
 
         startService(new Intent(this, KillNotificationService.class));
 
@@ -119,8 +124,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onSensorChanged(SensorEvent event) {
         final Context c = this;
         val = lowPass(event.values.clone(), val);
-        final TextView t = (TextView) findViewById(R.id.msg1);
-        final TextView t2 = (TextView) findViewById(R.id.face);
         if (val[2] > 1.0f || val[2] < -1.0f) {
            // Log.d("TAG", Float.toString(val[2]));
 
@@ -132,10 +135,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         public void run() {
                             Log.d("TAG", "MANY COUNT " + eventCounter);
                             if (eventCounter < 20) {
-                                t.setText(R.string.light_drop_response);
-                                int unic = 0x1F613;
-                                String face =  getEmijoByUnicode(unic);
-                                t2.setText(face);
+                                setFaceAndMessage(light_drop_face, getString(R.string.light_drop_response));
                                 //------set up the buttons-----//
                                 Button btnHi = (Button)findViewById(R.id.hiButton);
                                 Button btnEating = (Button)findViewById(R.id.eatingButton);
@@ -193,6 +193,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
+    @Override
+    public void onBackPressed() {
+        Toast.makeText(this,"Use home button instead", Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     protected void onResume() {
@@ -261,10 +265,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         TextView t1 = (TextView) findViewById(R.id.msg1);
         TextView t2 = (TextView) findViewById(R.id.face);
 
-        t1.setText(R.string.hello);
-        int unic = 0x1F601;
-        String face =  getEmijoByUnicode(unic);
-        t2.setText(face);
+
+        setFaceAndMessage(helloFace, getString(R.string.hello));
 
         //t2.setText(R.string.happy_face);
 
@@ -297,13 +299,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void bonAppetite(View view) {
-        TextView t1 = (TextView) findViewById(R.id.msg1);
-        TextView t2 = (TextView) findViewById(R.id.face);
 
-        t1.setText(R.string.eating_s);
-        int unic = 0x1F60B;
-        String face =  getEmijoByUnicode(unic);
-        t2.setText(face);
+        setFaceAndMessage(eating_face, getString(R.string.eating_s));
 
         //t2.setText(R.string.happy_face);
 
@@ -332,10 +329,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void batteryLevelFaceDisplay(String input){
-        TextView t1 = (TextView) findViewById(R.id.msg1);
-        TextView t2 = (TextView) findViewById(R.id.face);
-        String face ="";
-        int unic;
+
         Button btnSorry = (Button)findViewById(R.id.sorryButton);
         Button btnHi = (Button)findViewById(R.id.hiButton);
         Button btnEating = (Button)findViewById(R.id.eatingButton);
@@ -344,44 +338,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         switch (input){
             case BatteryCheckService.BATTERY_POWER_BELOW_HALF:
-                t1.setText(R.string.battery_below_half);
-                unic = 0x1F610;
-                face =  getEmijoByUnicode(unic);
-                t2.setText(face);
+                setFaceAndMessage(below_half_battery_face, getString(R.string.battery_below_half));
                 //remove the greeting button
                 btnHi.setVisibility(View.INVISIBLE); //View.GONE, View.INVISIBLE are available too.
                 btnEating.setVisibility(View.INVISIBLE); // remove the eating button too
 
-                //t2.setText(R.string.battery_below_half_face);
 
                 break;
             case BatteryCheckService.BATTERY_POWER_LOW:
-                t1.setText(R.string.battery_low);
-                unic = 0x1F635;
-                face =  getEmijoByUnicode(unic);
-                t2.setText(face);
-                //t2.setText(R.string.battery_low_face);
+                setFaceAndMessage(low_battery_face, getString(R.string.battery_low));
                 //remove the greeting button
                 btnHi.setVisibility(View.INVISIBLE); //View.GONE, View.INVISIBLE are available too.
                 btnEating.setVisibility(View.INVISIBLE); // remove the eating button too
 
                 break;
             case BatteryCheckService.BATTERY_POWER_VERY_LOW:
-                t1.setText(R.string.battery_very_low);
-                unic = 0x1F616;
-                face =  getEmijoByUnicode(unic);
-                t2.setText(face);
-                //t2.setText(R.string.battery_very_low_face);
+
                 //remove the greeting button
+                setFaceAndMessage(very_low_battery_face, getString(R.string.battery_very_low));
                 btnHi.setVisibility(View.INVISIBLE); //View.GONE, View.INVISIBLE are available too.
                 btnEating.setVisibility(View.INVISIBLE); //remove the eating button too
 
                 break;
             case BatteryCheckService.BATTERY_POWER_CHARGING:
-                t1.setText(R.string.battery_charging);
-                unic = 0x1F60F;
-                face =  getEmijoByUnicode(unic);
-                t2.setText(face);
+
+                setFaceAndMessage(battery_charging_face, getString(R.string.battery_charging));
                 //t2.setText(R.string.battery_charging_face);
                 //remove the greeting button
                 btnHi.setVisibility(View.INVISIBLE); //View.GONE, View.INVISIBLE are available too.
@@ -393,11 +374,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
                 break;
             default:
-                t1.setText(R.string.hello);
-                //standard smiling face
-                unic = 0x1F601;
-                face =  getEmijoByUnicode(unic);
-                t2.setText(face);
+                setFaceAndMessage(helloFace, getString(R.string.hello));
                 //Show hi button
                 btnHi.setVisibility(View.VISIBLE);
                 //remove the sorry button
@@ -456,6 +433,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public String getEmijoByUnicode(int unicode)
     {
         return new String(Character.toChars(unicode));
+    }
+
+    private void setFaceAndMessage(int faceUnicode, String message){
+        TextView t1 = (TextView) findViewById(R.id.msg1);
+        TextView t2 = (TextView) findViewById(R.id.face);
+
+        String face = getEmijoByUnicode(faceUnicode);
+
+        t1.setText(message);
+        t2.setText(face);
+
     }
 
 }
