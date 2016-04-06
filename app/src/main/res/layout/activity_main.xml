@@ -38,4 +38,25 @@
         android:layout_marginTop="30dp"
         android:onClick="saySorry"
         />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/greeting"
+        android:id="@+id/hiButton"
+        android:layout_alignEnd="@+id/sorryButton"
+        android:layout_alignStart="@+id/sorryButton"
+        android:layout_below="@+id/sorryButton"
+        android:onClick="nice2m"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/eating_m"
+        android:id="@+id/eatingButton"
+        android:onClick="bonAppetite"
+        android:layout_below="@+id/hiButton"
+        android:layout_alignStart="@+id/hiButton"
+        android:layout_alignEnd="@+id/hiButton" />
 </RelativeLayout>
