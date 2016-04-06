@@ -40,7 +40,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor mSensor;
     private int eventCounter = -1;
     private PowerManager.WakeLock wl;
-    private BroadcastReceiver batteryReceiver;
+    private BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra(BatteryCheckService.BATTERY_UI_MESSAGE);
+            batteryLevelFaceDisplay(message);
+
+            //log that the battery message has been sent in a txt
+            //log the bounce count in logcat
+            Log.i("BatteryReceive", "Battery Message: " +message);
+
+            //retrieve the date and create the payload of the data
+            String[] cur_day = get_day();
+            String payload = cur_day[0]+" is: "+message;
+            //write the data to the txt of that day
+            generateNoteOnSD(getApplicationContext(), "Battery-message-" + (cur_day[1] + ".txt"), "Battery message on " + (payload + "\r\n"));
+
+            Log.e("TAG", message);
+        }
+    };;
 
     private static final int helloFace = 0x1F601;
     private static final int low_battery_face = 0x1F635;
@@ -89,25 +107,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Intent monitorIntent = new Intent(this, BatteryCheckService.class);
         startService(monitorIntent);
 
-        batteryReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String message = intent.getStringExtra(BatteryCheckService.BATTERY_UI_MESSAGE);
-                batteryLevelFaceDisplay(message);
 
-                //log that the battery message has been sent in a txt
-                //log the bounce count in logcat
-                Log.i("Battery", "Battery Message: " +message);
 
-                //retrieve the date and create the payload of the data
-                String[] cur_day = get_day();
-                String payload = cur_day[0]+" is: "+message;
-                //write the data to the txt of that day
-                generateNoteOnSD(getApplicationContext(), "Battery-message-" + (cur_day[1] + ".txt"), "Battery message on " + (payload + "\r\n"));
-
-                Log.e("TAG", message);
-            }
-        };
+        registerReceiver(batteryReceiver,
+                new IntentFilter(BatteryCheckService.BATTERY_UI_UPDATE)
+        );
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -209,11 +213,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onStart() {
         super.onStart();
-
-        LocalBroadcastManager.getInstance(this).registerReceiver((batteryReceiver),
-                new IntentFilter(BatteryCheckService.BATTERY_UI_UPDATE)
-        );
-
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -374,6 +373,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
                 break;
             default:
+
                 setFaceAndMessage(helloFace, getString(R.string.hello));
                 //Show hi button
                 btnHi.setVisibility(View.VISIBLE);

@@ -5,20 +5,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
+import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
-import static java.util.GregorianCalendar.*;
 
 /**
  * Created by Randy on 16-03-20.
@@ -37,8 +32,18 @@ public class BatteryCheckService extends Service {
 
     private static Integer masterCounter = 3;
 
+    Intent updateUIIntent;
+    private final Handler handler = new Handler();
 
-    private LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+//    private LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        updateUIIntent = new Intent(BATTERY_UI_UPDATE);
+    }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -66,14 +71,25 @@ public class BatteryCheckService extends Service {
         return null;
     }
 
-    public void requireActivityUpdate(String message) {
-        Intent intent = new Intent(BATTERY_UI_UPDATE);
-        if(message != null)
-            intent.putExtra(BATTERY_UI_MESSAGE, message);
-            Log.i("Date"+DateFormat.getDateTimeInstance(), "Battery Message: "+ message);
-        broadcastManager.sendBroadcast(intent);
-    }
+    public void requireActivityUpdate(final String message) {
 
+        Runnable sendUpdatesToUI = new Runnable() {
+            public void run() {
+                sendMessgeToUI();
+            }
+
+            private void sendMessgeToUI() {
+                if(message != null)
+                    updateUIIntent.putExtra(BATTERY_UI_MESSAGE, message);
+                Log.i("BatterySend", "Battery Message: "+ message);
+                sendBroadcast(updateUIIntent);
+
+            }
+        };
+        handler.removeCallbacks(sendUpdatesToUI);
+        handler.postDelayed(sendUpdatesToUI, 100);
+
+    }
 
     private class CPUCheckAsync extends AsyncTask<Void,Void,Void> {
         @Override

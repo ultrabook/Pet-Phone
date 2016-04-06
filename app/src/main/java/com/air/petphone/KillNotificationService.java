@@ -15,7 +15,7 @@ public class KillNotificationService extends Service {
     public static int NOTIFICATION_ID = 111;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        //NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Notification noti = new Notification.Builder(this)
                 .setContentTitle("^____^")
                 .setContentText("I'm Your Pet!")
