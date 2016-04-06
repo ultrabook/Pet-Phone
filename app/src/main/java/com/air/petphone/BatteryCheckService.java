@@ -81,7 +81,6 @@ public class BatteryCheckService extends Service {
             private void sendMessgeToUI() {
                 if(message != null)
                     updateUIIntent.putExtra(BATTERY_UI_MESSAGE, message);
-                Log.i("BatterySend", "Battery Message: "+ message);
                 sendBroadcast(updateUIIntent);
 
             }
@@ -129,7 +128,6 @@ public class BatteryCheckService extends Service {
             int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
             Log.i("BatteryInfo", "level: " + level +" scale: " + scale);
             Log.i("BatteryInfo", "Battery charge level: " + (level / (float)scale));
-            Log.i("Date"+DateFormat.getDateTimeInstance(), "Battery charge level: "+ (level / (float)scale));
 
             float batteryLevel = (level / (float)scale);
 
