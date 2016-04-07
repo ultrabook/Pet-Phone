@@ -117,24 +117,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // Initialize the ScreenReceiver
-        IntentFilter filterScreen = new IntentFilter(Intent.ACTION_SCREEN_ON);
-        filterScreen.addAction(Intent.ACTION_SCREEN_OFF);
-        BroadcastReceiver mReceiver = new ScreenReceiver();
-        registerReceiver(mReceiver, filterScreen);
-        //Finish initialization of ScreenReceiver
-
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Log.e("TAG", "onCREATE");
-
-        //I want to insert the conditional statement here and crate two xml-s basically one owuld be to say sorry, and one wold be to say hi.
-        //The xml to display will be based on whether any events are trigegred.
-        //Button btn = (Button)findViewById(R.id.thebuttonid);
-        //btn.setVisibility(View.VISIBLE); //View.GONE, View.INVISIBLE are available too.
-
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null) {
@@ -240,19 +227,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     protected void onResume() {
+        super.onResume();
         mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_GAME);
         eventCounter = -1;
         Log.d("TAG", "App is resumed");
-
-        // ONLY WHEN SCREEN TURNS ON
-        if (!ScreenReceiver.wasScreenOn) {
-            // THIS IS WHEN ONRESUME() IS CALLED DUE TO A SCREEN STATE CHANGE
-            System.out.println("SCREEN TURNED ON");
-        } else {
-            // THIS IS WHEN ONRESUME() IS CALLED WHEN THE SCREEN STATE HAS NOT CHANGED
-        }
-
-        super.onResume();
 
     }
 
@@ -281,13 +259,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     protected void onPause() {
-        // WHEN THE SCREEN IS ABOUT TO TURN OFF
-        if (ScreenReceiver.wasScreenOn) {
-            // THIS IS THE CASE WHEN ONPAUSE() IS CALLED BY THE SYSTEM DUE TO A SCREEN STATE CHANGE
-            System.out.println("SCREEN TURNED OFF");
-        } else {
-            // THIS IS WHEN ONPAUSE() IS CALLED WHEN THE SCREEN STATE HAS NOT CHANGED
-        }
 
         super.onPause();
     }
@@ -347,9 +318,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onStop() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(batteryReceiver);
 
-//        if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-//            //do something
-//        }
         super.onStop();
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
