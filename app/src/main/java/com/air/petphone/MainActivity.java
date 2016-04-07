@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private int eventCounter = -1;
+    private static int unlockCounter = 0;
     private PowerManager.WakeLock wl;
     private String currentBatteryMessage = BatteryCheckService.BATTERY_POWER_OK;
     private BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
@@ -68,10 +69,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             String action = intent.getAction();
             if (action.equals(Intent.ACTION_USER_PRESENT)) {
                 Log.i("Screen", "UNLOCKED");
+
+                unlockCounter++;
                 String[] cur_day = get_day();
                 String payload = cur_day[0] + " Unlocked ";
                 generateNoteOnSD(getApplicationContext(), "Phone-Lock-" + (cur_day[1] + ".txt"), payload + "\r\n");
-                NotificationCenter.sendNotification(131, MainActivity.this, MainActivity.class, ">___>", "You look at me too much", "Sorry!");
+
+                if(unlockCounter >= 4) {
+                    NotificationCenter.sendNotification(131, MainActivity.this, MainActivity.class, ">___>", "You look at me too much", "Sorry!");
+                    unlockCounter = 0;
+                }
             }
         }
     };

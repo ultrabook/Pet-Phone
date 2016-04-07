@@ -94,7 +94,7 @@ public class BatteryCheckService extends Service {
         @Override
         protected Void doInBackground(Void... params) {
             Integer[] cpu = getCpuUsageStatistic();
-            if(cpu[0] + cpu[1] > 40){
+            if(cpu[0] + cpu[1] > 35){
                 Integer cpu_f = cpu[0]+cpu[1];
                 Log.i("CPU", "CPU Message: "+ cpu_f);
                 if(masterCounter >= 15) NotificationCenter.sendNotification(120, BatteryCheckService.this,MainActivity.class,">____<\"\"", "CPU is doing work", "Ok");
