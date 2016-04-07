@@ -1,18 +1,25 @@
 package com.air.petphone;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 
 /**
@@ -31,6 +38,7 @@ public class BatteryCheckService extends Service {
     public static final String BATTERY_POWER_OK = "battery_ok";
 
     private static Integer masterCounter = 10;
+    private static Integer cpuCounter = 4;
 
     Intent updateUIIntent;
     private final Handler handler = new Handler();
@@ -93,12 +101,24 @@ public class BatteryCheckService extends Service {
     private class CPUCheckAsync extends AsyncTask<Void,Void,Void> {
         @Override
         protected Void doInBackground(Void... params) {
+
+            cpuCounter++;
+            if(cpuCounter < 4)  return null;
+            cpuCounter = 0;
+
             Integer[] cpu = getCpuUsageStatistic();
-            if(cpu[0] + cpu[1] > 35){
+            Integer usage = cpu[0]+cpu[1];
+            Log.i("CPU", "CPU Message: "+ usage);
+            String[] cur_day = get_day();
+            String payload = cur_day[0] + " CPU %: " + usage;
+
+            if(cpu[0] + cpu[1] >= 30){
                 Integer cpu_f = cpu[0]+cpu[1];
-                Log.i("CPU", "CPU Message: "+ cpu_f);
-                if(masterCounter >= 4) NotificationCenter.sendNotification(120, BatteryCheckService.this,MainActivity.class,">____<\"\"", "CPU is doing work", "Ok");
+                Log.i("CPU", "CPU Speed: "+ cpu_f);
+                NotificationCenter.sendNotification(120, BatteryCheckService.this,MainActivity.class,">____<\"\"", "CPU is doing work", "Ok");
+                payload = payload + " (noti)";
             }
+            generateNoteOnSD(getApplicationContext(), "CPU-" + (cur_day[1] + ".txt"), payload + "\r\n");
             return null;
         }
     }
@@ -220,5 +240,45 @@ public class BatteryCheckService extends Service {
             }
         }
         return returnString;
+    }
+
+    public void generateNoteOnSD(Context context, String sFileName, String sBody) {
+        try {
+
+            File root = new File(Environment.getExternalStorageDirectory(), "Pet-phone-logs");
+            if (!root.exists()) {
+                root.mkdirs();
+            }
+            File gpxfile = new File(root, sFileName);
+            FileWriter writer = new FileWriter(gpxfile, true);
+            writer.append(sBody);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String[] get_day() {
+        //array to hold two types of dates
+        String[] reportDate = new String[2];
+
+        // Create an instance of SimpleDateFormat used for formatting
+        // the string representation of date (month/day/year)
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
+        // Get the date today using Calendar object.
+        Date today1 = Calendar.getInstance().getTime();
+        // Using DateFormat format method we can create a string
+        // representation of a date with the defined format.
+
+        reportDate[0] = df.format(today1);
+
+        DateFormat df2 = new SimpleDateFormat("MM-dd-yyyy");
+        Date today2 = Calendar.getInstance().getTime();
+        reportDate[1] = df2.format(today2);
+
+
+        return reportDate;
     }
 }
