@@ -320,6 +320,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE);
 
         batteryLevelFaceDisplay(currentBatteryMessage);
+        //---log the apology to the phone --//
+        //retrieve the date and create the payload of the data
+        String[] cur_day = get_day();
+        String payload = cur_day[0] + " - just said sorry";
+        //write the data to the txt of that day
+        generateNoteOnSD(getApplicationContext(), "Apology-Count-" + (cur_day[1] + ".txt"), payload + "\r\n");
 
     }
 
