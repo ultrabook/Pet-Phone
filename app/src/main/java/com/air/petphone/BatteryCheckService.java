@@ -97,7 +97,7 @@ public class BatteryCheckService extends Service {
             if(cpu[0] + cpu[1] > 35){
                 Integer cpu_f = cpu[0]+cpu[1];
                 Log.i("CPU", "CPU Message: "+ cpu_f);
-                if(masterCounter >= 15) NotificationCenter.sendNotification(120, BatteryCheckService.this,MainActivity.class,">____<\"\"", "CPU is doing work", "Ok");
+                if(masterCounter >= 4) NotificationCenter.sendNotification(120, BatteryCheckService.this,MainActivity.class,">____<\"\"", "CPU is doing work", "Ok");
             }
             return null;
         }
@@ -107,9 +107,6 @@ public class BatteryCheckService extends Service {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-
-//            if(masterCounter < 3) return null;
-//            masterCounter = 0;
 
             String uiMessage = BATTERY_POWER_BELOW_HALF;
 
