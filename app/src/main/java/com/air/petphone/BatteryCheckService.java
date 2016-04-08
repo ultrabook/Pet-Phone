@@ -115,7 +115,7 @@ public class BatteryCheckService extends Service {
             if(cpu[0] + cpu[1] >= 30){
                 Integer cpu_f = cpu[0]+cpu[1];
                 Log.i("CPU", "CPU Speed: "+ cpu_f);
-                NotificationCenter.sendNotification(120, BatteryCheckService.this,MainActivity.class,">____<\"\"", "CPU is doing work", "Ok");
+                NotificationCenter.sendNotification(120, BatteryCheckService.this,MainActivity.class,">____<\"\"", "CPU is doing work", "Ok", "CPU_Overworked");
                 payload = payload + " (noti)";
             }
             generateNoteOnSD(getApplicationContext(), "CPU-" + (cur_day[1] + ".txt"), payload + "\r\n");
@@ -166,13 +166,13 @@ public class BatteryCheckService extends Service {
 
             if(batteryLevel < batteryThreshold && !isCharging) {
                 if(masterCounter >= 10) {
-                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, title, detail, "Charging now!");
+                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, title, detail, "Charging now!", "hungry");
                     masterCounter = 0;
                 }
             }
             else if (batteryLevel < batteryThreshold && isCharging){
                 if(masterCounter >= 10) {
-                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, ":D", "Eating eating", "Great!");
+                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, ":D", "Eating eating", "Great!", "feeding");
                     masterCounter = 0;
                 }
                 uiMessage = BATTERY_POWER_CHARGING;

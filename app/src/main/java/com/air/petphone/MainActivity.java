@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 generateNoteOnSD(getApplicationContext(), "Phone-Lock-" + (cur_day[1] + ".txt"), payload + "\r\n");
 
                 if(unlockCounter >= 4) {
-                    NotificationCenter.sendNotification(131, MainActivity.this, MainActivity.class, ">___>", "You look at me too much", "Sorry!");
+                    NotificationCenter.sendNotification(131, MainActivity.this, MainActivity.class, ">___>", "You look at me too much", "Sorry!", "frequent_unlock");
                     unlockCounter = 0;
                 }
             }
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             String action = intent.getAction();
             if (action.equals(Intent.ACTION_POWER_CONNECTED)) {
                 Log.i("Plug", "plugged");
-                NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Food Time!", "Enjoy!");
+                NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Food Time!", "Enjoy!", "power_connected");
                 batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_CHARGING);
                 //log that power was connected
                 loggingBattery("Battery_Power_CONNECTED");
@@ -104,13 +104,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             if (action.equals(Intent.ACTION_POWER_DISCONNECTED)) {
                 Log.i("Plug", "unplugged");
-                NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "T____T", "No more food", "Sorry! Next time!");
+                NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "T____T", "No more food", "Sorry! Next time!", "power_disconnected");
                 batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_OK);
                 //Log that power was disconnected
                 loggingBattery("Battery_Power_DISCONNECTED"); 
 
 
             }
+
+
         }
     };
 
@@ -196,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                                 setFaceAndMessage(light_drop_face, getString(R.string.light_drop_response));
                                 setButtonVisibility(View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
 
-                                NotificationCenter.sendNotification(100, c, MainActivity.class, "HEY!!", "YOU DROPPED ME!!", ":(");
+                                NotificationCenter.sendNotification(100, c, MainActivity.class, "HEY!!", "YOU DROPPED ME!!", ":(", "drop_sorry");
                                 //log the bounce count in logcat
                                 Log.i("Counter", "Bounce count: " + bounceCount);
                                 //retrieve the date and create the payload of the data
