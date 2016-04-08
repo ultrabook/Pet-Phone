@@ -53,15 +53,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             //log the bounce count in logcat
             Log.i("BatteryReceive", "Battery Message: " + message);
 
-            //log only if the battery status is something other than OK
-            if(message != "battery_ok")
-            {
-                //retrieve the date and create the payload of the data
-                String[] cur_day = get_day();
-                String payload = cur_day[0] + " battery: " + message;
-                //write the data to the txt of that day
-                generateNoteOnSD(getApplicationContext(), "Battery-message-" + (cur_day[1] + ".txt"), payload + "\r\n");
-            }
+//            //log only if the battery status is something other than OK
+//            if(message != BatteryCheckService.BATTERY_POWER_OK)
+//            {
+//                //retrieve the date and create the payload of the data
+//                String[] cur_day = get_day();
+//                String payload = cur_day[0] + " battery: " + message;
+//                //write the data to the txt of that day
+//                generateNoteOnSD(getApplicationContext(), "Additional-Battery-Message-" + (cur_day[1] + ".txt"), payload + "\r\n");
+//            }
 
             Log.e("TAG", message);
         }
@@ -111,9 +111,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "T____T", "No more food", "Sorry! I'll charge you more next time!");
                 batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_OK);
                 //Log that power was disconnected
-                loggingBattery("Battery_Power_DISCONNECTED"); 
-
-
+                loggingBattery("Battery_Power_DISCONNECTED");
             }
         }
     };
@@ -188,8 +186,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onSensorChanged(SensorEvent event) {
         final Context c = this;
         val = lowPass(event.values.clone(), val);
-        if (val[2] > 1.0f || val[2] < -1.0f) {
-            // Log.d("TAG", Float.toString(val[2]));
+        Log.d("TAG-z", Float.toString(val[2]));
+        Log.d("TAG-y", Float.toString(val[1]));
+        Log.d("TAG-x", Float.toString(val[0]));
+        if (val[2] > 0.5f || val[2] < -0.5f || val[1] > 0.5f || val[1] < -0.5f || val[0] > 0.5f || val[0] < -0.5f) {
+            Log.d("TAG", Float.toString(val[2]));
 
             TimerTask task = new TimerTask() {
                 @Override
@@ -217,18 +218,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             };
 
-            if (val[2] < -15.0f) {
+            if (val[2] < -10.0f) {
                 bounceCount++;
 
             }
 
-            if (val[2] < -15.0f && eventCounter == -1) {
+            if (val[2] < -10.0f && eventCounter == -1) {
                 eventCounter = 1;
                 Timer timer = new Timer("timer1");
-                timer.schedule(task, 3000);
+                timer.schedule(task, 2000);
 
                 Log.d("Counter", "Counter Loaded");
-            } else if (val[2] < -15.0f && eventCounter != -1) {
+            } else if (val[2] < -10.0f && eventCounter != -1) {
                 // Log.d("TAG", Float.toString(val[2]));
                 eventCounter++;
 
@@ -296,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     //Low pass filter to filter out unwanted signals
-    float ALPHA = 0.5f;
+    float ALPHA = 0.7f;
 
     protected float[] lowPass(float[] input, float[] output) {
         if (output == null) return input;
@@ -318,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //---log the apology to the phone --//
         //retrieve the date and create the payload of the data
         String[] cur_day = get_day();
-        String payload = cur_day[0] + " - just said sorry";
+        String payload = cur_day[0] + " - just said sorry for being CARELESS";
         //write the data to the txt of that day
         generateNoteOnSD(getApplicationContext(), "Apology-Count-" + (cur_day[1] + ".txt"), payload + "\r\n");
 
@@ -328,8 +329,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         setFaceAndMessage(unamused_face, getString(R.string.hungry));
         setButtonVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.VISIBLE);
-
+        //Display the phones response to your denial
         Toast.makeText(getApplicationContext(), "But Im so hungry...", Toast.LENGTH_SHORT).show();
+
+        //---log the apology to the phone --//
+        //retrieve the date and create the payload of the data
+        String[] cur_day = get_day();
+        String payload = cur_day[0] + " - just said sorry for NOT CHARGING";
+        //write the data to the txt of that day
+        generateNoteOnSD(getApplicationContext(), "Apology-Count-" + (cur_day[1] + ".txt"), payload + "\r\n");
 
     }
     public void nice2m(View view) {
@@ -342,9 +350,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void bonAppetite(View view) {
 
-        setFaceAndMessage(eating_face, getString(R.string.eating_s));
+       // setFaceAndMessage(eating_face, getString(R.string.eating_s));
+        //set the face to be happy hello face
+        setFaceAndMessage(helloFace, getString(R.string.hello));
+        //Display phone gratitude
+        Toast.makeText(getApplicationContext(), "Thank you for the food!", Toast.LENGTH_SHORT).show();
+        setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
 
-        Toast.makeText(getApplicationContext(), "Thank you!", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -419,15 +432,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
-    public void loggingBattery(String message)
-        {
-            //retrieve the date and create the payload of the data
-            String[] cur_day = get_day();
+    public void loggingBattery(String message) {
+        //retrieve the date and create the payload of the data
+        String[] cur_day = get_day();
 
             String payload = cur_day[0] + " - the message is: " + message;
             //write the data to the txt of that day
             generateNoteOnSD(getApplicationContext(), "Battery-Messages-From-Main- " + (cur_day[1] + ".txt"), payload + "\r\n");
-        }
+
+
+    }
 
     public void generateNoteOnSD(Context context, String sFileName, String sBody) {
         try {

@@ -115,7 +115,7 @@ public class BatteryCheckService extends Service {
             if(cpu[0] + cpu[1] >= 30){
                 Integer cpu_f = cpu[0]+cpu[1];
                 Log.i("CPU", "CPU Speed: "+ cpu_f);
-                NotificationCenter.sendNotification(120, BatteryCheckService.this,MainActivity.class,">____<\"\"", "CPU is doing work", "Ok");
+                NotificationCenter.sendNotification(120, BatteryCheckService.this,MainActivity.class,">____<\"\"", "CPU is doing work", "Sorry for making you work so hard!");
                 payload = payload + " (noti)";
             }
             generateNoteOnSD(getApplicationContext(), "CPU-" + (cur_day[1] + ".txt"), payload + "\r\n");
