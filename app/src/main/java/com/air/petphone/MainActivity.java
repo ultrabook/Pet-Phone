@@ -52,15 +52,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             //log the bounce count in logcat
             Log.i("BatteryReceive", "Battery Message: " + message);
 
-            //log only if the battery status is something other than OK
-            if(message != "battery_ok")
-            {
-                //retrieve the date and create the payload of the data
-                String[] cur_day = get_day();
-                String payload = cur_day[0] + " battery: " + message;
-                //write the data to the txt of that day
-                generateNoteOnSD(getApplicationContext(), "Battery-message-" + (cur_day[1] + ".txt"), payload + "\r\n");
-            }
+            //retrieve the date and create the payload of the data
+            String[] cur_day = get_day();
+            String payload = cur_day[0] + " battery: " + message;
+            //write the data to the txt of that day
+            generateNoteOnSD(getApplicationContext(), "Battery-message-" + (cur_day[1] + ".txt"), payload + "\r\n");
 
             Log.e("TAG", message);
         }
@@ -96,19 +92,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 Log.i("Plug", "plugged");
                 NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Food Time!", "Enjoy!");
                 batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_CHARGING);
-                //log that power was connected
-                loggingBattery("Battery_Power_CONNECTED");
-
-
             }
 
             if (action.equals(Intent.ACTION_POWER_DISCONNECTED)) {
                 Log.i("Plug", "unplugged");
                 NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "T____T", "No more food", "Sorry! Next time!");
                 batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_OK);
-                //Log that power was disconnected
-                loggingBattery("Battery_Power_DISCONNECTED"); 
-
 
             }
         }
@@ -362,15 +351,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 setFaceAndMessage(below_half_battery_face, getString(R.string.battery_below_half));
                 //remove the greeting button
                 setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE);
-                loggingBattery("Battery_below_half");
 
                 break;
             case BatteryCheckService.BATTERY_POWER_LOW:
                 setFaceAndMessage(low_battery_face, getString(R.string.battery_low));
                 //remove the greeting button
                 setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE);
-                loggingBattery("Battery_Power_Low");
-
 
                 break;
             case BatteryCheckService.BATTERY_POWER_VERY_LOW:
@@ -378,8 +364,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 //remove the greeting button
                 setFaceAndMessage(very_low_battery_face, getString(R.string.battery_very_low));
                 setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE);
-                loggingBattery("Battery_Power_Very_Low ");
-
 
                 break;
             case BatteryCheckService.BATTERY_POWER_CHARGING:
@@ -387,8 +371,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 setFaceAndMessage(battery_charging_face, getString(R.string.battery_charging));
                 //t2.setText(R.string.battery_charging_face);
                 setButtonVisibility(View.INVISIBLE, View.INVISIBLE, View.VISIBLE);
-                //loggingBattery("Battery_Power_Charging");
-
 
 
                 break;
@@ -402,16 +384,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-
-    public void loggingBattery(String message)
-        {
-            //retrieve the date and create the payload of the data
-            String[] cur_day = get_day();
-
-            String payload = cur_day[0] + " - the message is: " + message;
-            //write the data to the txt of that day
-            generateNoteOnSD(getApplicationContext(), "Battery-Messages-From-Main- " + (cur_day[1] + ".txt"), payload + "\r\n");
-        }
 
     public void generateNoteOnSD(Context context, String sFileName, String sBody) {
         try {
