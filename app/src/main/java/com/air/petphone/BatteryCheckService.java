@@ -166,13 +166,13 @@ public class BatteryCheckService extends Service {
 
             if(batteryLevel < batteryThreshold && !isCharging) {
                 if(masterCounter >= 10) {
-                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, title, detail, "Charging now!");
+                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, title, detail, "Sorry for starving you!");
                     masterCounter = 0;
                 }
             }
             else if (batteryLevel < batteryThreshold && isCharging){
                 if(masterCounter >= 10) {
-                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, ":D", "Eating eating", "Great!");
+                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, ":D", "What took you so long?", "Sorry that it took so long!");
                     masterCounter = 0;
                 }
                 uiMessage = BATTERY_POWER_CHARGING;

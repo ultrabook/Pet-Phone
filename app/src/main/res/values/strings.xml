@@ -3,17 +3,19 @@
     <string name="light_drop_response">WOW!! YOU DROPPED ME!!!!</string>
     <string name="happy_face">^_____^</string>
     <string name="shocked_face">O_____O</string>
-    <string name="sorry">Sorry :(</string>
+    <string name="sorry">Sorry for being careless with you!</string>
+    <string name="sorryHung">Sorry I cant charge you right now!</string>
     <string name="hello">Hello!</string>
     <string name="greeting">Howdy!</string>
-    <string name="eating_s">Omnomnom...</string>
-    <string name="eating_m">Bon Appétit!</string>
+    <string name="eating_s">Omnomnom... What took you so long?</string>
+    <string name="eating_m">Sorry it took so long!</string>
     <string name="battery_below_half">Getting kind of hungry</string>
+    <string name="hungry">Hungry...</string>
     <string name="battery_below_half_face">0_____0""</string>
     <string name="battery_low">Feed me please</string>
     <string name="battery_low_face">\@_____@</string>
     <string name="battery_very_low">Too weak… Need food…</string>
     <string name="battery_very_low_face">X_____X</string>
-    <string name="battery_charging">Eating eating...</string>
+    <string name="battery_charging">Took you long enough!</string>
     <string name="battery_charging_face">^_____^</string>
 </resources>
