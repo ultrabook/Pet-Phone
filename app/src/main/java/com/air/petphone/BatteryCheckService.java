@@ -115,7 +115,7 @@ public class BatteryCheckService extends Service {
             if(cpu[0] + cpu[1] >= 30){
                 Integer cpu_f = cpu[0]+cpu[1];
                 Log.i("CPU", "CPU Speed: "+ cpu_f);
-                NotificationCenter.sendNotification(120, BatteryCheckService.this,MainActivity.class,">____<\"\"", "CPU is doing work", "Sorry for making you work so hard!");
+                NotificationCenter.sendNotification(120, BatteryCheckService.this,MainActivity.class,">____<\"\"", "CPU is doing work", "Sorry! I will turn it down soon!");
                 payload = payload + " (noti)";
             }
             generateNoteOnSD(getApplicationContext(), "CPU-" + (cur_day[1] + ".txt"), payload + "\r\n");
@@ -150,12 +150,12 @@ public class BatteryCheckService extends Service {
             String detail = "Getting kind of hungry";
             String title = "0____0\"\"";
 
-            if(batteryLevel <= 0.1) {
+            if(batteryLevel <= 0.2) {
                 detail = "Too weak... Need food...";
                 title = "X___X";
                 uiMessage = BATTERY_POWER_VERY_LOW;
             }
-            else if (batteryLevel <= 0.3){
+            else if (batteryLevel <= 0.35){
                 detail = "Feed me please";
                 title = "@___@";
                 uiMessage = BATTERY_POWER_LOW;
@@ -165,13 +165,13 @@ public class BatteryCheckService extends Service {
 
             if(batteryLevel < batteryThreshold && !isCharging) {
                 if(masterCounter >= 10) {
-                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, title, detail, "Sorry for starving you!");
+                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, title, detail, "Sorry! Just a moment");
                     masterCounter = 0;
                 }
             }
             else if (batteryLevel < batteryThreshold && isCharging){
                 if(masterCounter >= 10) {
-                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, ":D", "What took you so long?", "Sorry that it took so long!");
+                    NotificationCenter.sendNotification(121, BatteryCheckService.this, MainActivity.class, ":D", "(Eating eating)", "That looks tasty");
                     masterCounter = 0;
                 }
                 uiMessage = BATTERY_POWER_CHARGING;

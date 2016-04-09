@@ -22,7 +22,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         Log.e(TAG, "Alarm created");
         final AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         // start alarm right away
-        manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, 90*1000,
+        manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, 20*1000,
                 getAlarmIntent(context));
     }
 

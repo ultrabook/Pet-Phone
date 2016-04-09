@@ -31,7 +31,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -74,9 +73,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 generateNoteOnSD(getApplicationContext(), "Phone-Lock-" + (cur_day[1] + ".txt"), payload + "\r\n");
 
                 if(unlockCounter >= 4) {
-                    NotificationCenter.sendNotification(131, MainActivity.this, MainActivity.class, ">___>", "...", "Sorry for waking you up!");
+                    NotificationCenter.sendNotification(131, MainActivity.this, MainActivity.class, ">___>", "Can't you see I'm sleeping?", "Oops! Sorry..");
                     //set the sleepy face
-                    setFaceAndMessage(sleepy_face, "...");
+                    setFaceAndMessage(sleepy_face, "Zzzz...");
 
                     unlockCounter = 0;
                 }
@@ -92,10 +91,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if (action.equals(Intent.ACTION_POWER_CONNECTED)) {
 
                 // TODO: 16-04-08 only send notification on low
-                NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Took you long enough!", "Sorry that it took so long!");
+                NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Food Time!", "Sorry for the wait");
                 batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_CHARGING);
                 //log that power was connected
-                loggingBattery("Power_Connected");
+                loggingBattery("power_connected");
 
             }
 
@@ -104,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "T____T", "No more food", "Sorry! I'll charge you more next time!");
                 batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_OK);
                 //Log that power was disconnected
-                loggingBattery("Power_Disconnected");
+                loggingBattery("power_disconnected");
             }
         }
     };
@@ -309,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //---log the apology to the phone --//
         //retrieve the date and create the payload of the data
         String[] cur_day = get_day();
-        String payload = cur_day[0] + " - just said sorry for being CARELESS";
+        String payload = cur_day[0] + " - sorry for DROPPING";
         //write the data to the txt of that day
         generateNoteOnSD(getApplicationContext(), "Apology-Count-" + (cur_day[1] + ".txt"), payload + "\r\n");
 
@@ -325,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //---log the apology to the phone --//
         //retrieve the date and create the payload of the data
         String[] cur_day = get_day();
-        String payload = cur_day[0] + " - just said sorry for NOT CHARGING";
+        String payload = cur_day[0] + " - sorry for NOT CHARGING";
         //write the data to the txt of that day
         generateNoteOnSD(getApplicationContext(), "Apology-Count-" + (cur_day[1] + ".txt"), payload + "\r\n");
 

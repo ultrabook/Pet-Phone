@@ -67,5 +67,5 @@
         android:text="@string/sorryHung"
         android:onClick="cantFeedYou"
         android:layout_below="@+id/eatingButton"
-        android:layout_alignEnd="@+id/sorryButton" />
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>

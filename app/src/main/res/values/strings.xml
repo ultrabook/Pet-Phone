@@ -4,11 +4,11 @@
     <string name="happy_face">^_____^</string>
     <string name="shocked_face">O_____O</string>
     <string name="sorry">Sorry for being careless with you!</string>
-    <string name="sorryHung">Sorry I cant charge you right now!</string>
+    <string name="sorryHung">Sorry! Just a moment</string>
     <string name="hello">Hello!</string>
     <string name="greeting">Howdy!</string>
-    <string name="eating_s">Omnomnom... What took you so long?</string>
-    <string name="eating_m">Sorry it took so long!</string>
+    <string name="eating_s">Omnomnom...</string>
+    <string name="eating_m">Sorry! Here you go!</string>
     <string name="battery_below_half">Getting kind of hungry</string>
     <string name="hungry">Hungry...</string>
     <string name="battery_below_half_face">0_____0""</string>
