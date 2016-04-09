@@ -30,8 +30,8 @@ public final class NotificationCenter {
                 .setVibrate(new long[]{0, 1000, 100, 1000, 100, 1000, 100})
                 .setDefaults(Notification.DEFAULT_SOUND)
                 //the code to auto close the notification after click -- begin//
-                .setAutoCancel(true)
-                .setContentIntent(p)
+//                .setAutoCancel(true)
+//                .setContentIntent(p)
                 //the code to auto close notification -- end//
                 .build();
         notificationManager.notify(ID, noti);

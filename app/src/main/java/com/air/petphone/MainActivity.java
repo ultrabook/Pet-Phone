@@ -31,8 +31,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -52,15 +50,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             //log the bounce count in logcat
             Log.i("BatteryReceive", "Battery Message: " + message);
 
-//            //log only if the battery status is something other than OK
-//            if(message != BatteryCheckService.BATTERY_POWER_OK)
-//            {
-//                //retrieve the date and create the payload of the data
-//                String[] cur_day = get_day();
-//                String payload = cur_day[0] + " battery: " + message;
-//                //write the data to the txt of that day
-//                generateNoteOnSD(getApplicationContext(), "Additional-Battery-Message-" + (cur_day[1] + ".txt"), payload + "\r\n");
-//            }
+            //log only if the battery status is something other than OK
+            if(!message.equals(BatteryCheckService.BATTERY_POWER_OK))
+            {
+                loggingBattery(message);
+            }
 
             Log.e("TAG", message);
         }
@@ -72,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action.equals(Intent.ACTION_USER_PRESENT)) {
-                Log.i("Screen", "UNLOCKED");
 
                 unlockCounter++;
                 String[] cur_day = get_day();
@@ -95,13 +88,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals(Intent.ACTION_POWER_CONNECTED) && (currentBatteryMessage.equals(BatteryCheckService.BATTERY_POWER_LOW) ||  currentBatteryMessage.equals(BatteryCheckService.BATTERY_POWER_VERY_LOW))) {
-                Log.i("Plug", "plugged");
+            if (action.equals(Intent.ACTION_POWER_CONNECTED)) {
+
+                // TODO: 16-04-08 only send notification on low
                 NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Took you long enough!", "Sorry that it took so long!");
                 batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_CHARGING);
                 //log that power was connected
-                loggingBattery("Battery_Power_CONNECTED");
-
+                loggingBattery("Power_Connected");
 
             }
 
@@ -110,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "T____T", "No more food", "Sorry! I'll charge you more next time!");
                 batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_OK);
                 //Log that power was disconnected
-                loggingBattery("Battery_Power_DISCONNECTED");
+                loggingBattery("Power_Disconnected");
             }
         }
     };
@@ -147,24 +140,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null) {
             mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-           // Log.d("STAT", "SUCCESS");
-            Log.e("STAT", "Linear acceleration exists");
-        }
-        else
-        {
-            Log.e("Sensor", "FATAL ERROR: No linear acceleration exists");
-        }
-
-
-
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        if (mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
-            mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            Log.e("STAT", "Normal accelerometer exists");
-        }
-        else
-        {
-            Log.e("Sensor", "FATAL ERROR: No normal accelerometer exists");
+            Log.d("STAT", "SUCCESS");
         }
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -200,64 +176,61 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        final Context c = this;
-        val = lowPass(event.values.clone(), val);
-        Log.d("TAG-z", Float.toString(val[2]));
-        Log.d("TAG-y", Float.toString(val[1]));
-        Log.d("TAG-x", Float.toString(val[0]));
-        if (val[2] > 0.5f || val[2] < -0.5f || val[1] > 0.5f || val[1] < -0.5f || val[0] > 0.5f || val[0] < -0.5f) {
-            Log.d("TAG", Float.toString(val[2]));
-
-            TimerTask task = new TimerTask() {
-                @Override
-                public void run() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d("TAG", "MANY COUNT " + eventCounter);
-                            if (eventCounter < 20) {
-                                setFaceAndMessage(light_drop_face, getString(R.string.light_drop_response));
-                                setButtonVisibility(View.INVISIBLE, View.VISIBLE, View.INVISIBLE, View.INVISIBLE);
-
-                                NotificationCenter.sendNotification(100, c, MainActivity.class, "HEY!!", "YOU DROPPED ME!!", "Sorry for being careless with you!");
-                                //log the bounce count in logcat
-                                Log.i("Counter", "Bounce count: " + bounceCount);
-                                //retrieve the date and create the payload of the data
-                                String[] cur_day = get_day();
-                                String payload = cur_day[0] + " bounced: " + bounceCount;
-                                //write the data to the txt of that day
-                                generateNoteOnSD(getApplicationContext(), "Drop-count-" + (cur_day[1] + ".txt"), payload + "\r\n");
-                            }
-                            eventCounter = -1;
-                        }
-                    });
-                }
-            };
-
-            if (val[2] < -10.0f) {
-                bounceCount++;
-
-            }
-
-            if (val[2] < -10.0f && eventCounter == -1) {
-                eventCounter = 1;
-                Timer timer = new Timer("timer1");
-                timer.schedule(task, 2000);
-
-                Log.d("Counter", "Counter Loaded");
-            } else if (val[2] < -10.0f && eventCounter != -1) {
-                // Log.d("TAG", Float.toString(val[2]));
-                eventCounter++;
-
-
-                // Log.d("TAG", "2");
-            }
-
-//            if(val[2] < -15.0f && (System.currentTimeMillis()/1000) - now > 3 ){
-//                t.setText(R.string.light_drop_response);
-//                sendNotification();
+//        final Context c = this;
+//        val = lowPass(event.values.clone(), val);
+//        if (val[2] > 0.5f || val[2] < -0.5f || val[1] > 0.5f || val[1] < -0.5f || val[0] > 0.5f || val[0] < -0.5f) {
+//            Log.d("TAG", Float.toString(val[2]));
+//
+//            TimerTask task = new TimerTask() {
+//                @Override
+//                public void run() {
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Log.d("TAG", "MANY COUNT " + eventCounter);
+//                            if (eventCounter < 20) {
+//                                setFaceAndMessage(light_drop_face, getString(R.string.light_drop_response));
+//                                setButtonVisibility(View.INVISIBLE, View.VISIBLE, View.INVISIBLE, View.INVISIBLE);
+//
+//                                NotificationCenter.sendNotification(100, c, MainActivity.class, "HEY!!", "YOU DROPPED ME!!", "Sorry for being careless with you!");
+//                                //log the bounce count in logcat
+//                                Log.i("Counter", "Bounce count: " + bounceCount);
+//                                //retrieve the date and create the payload of the data
+//                                String[] cur_day = get_day();
+//                                String payload = cur_day[0] + " bounced: " + bounceCount;
+//                                //write the data to the txt of that day
+//                                generateNoteOnSD(getApplicationContext(), "Drop-count-" + (cur_day[1] + ".txt"), payload + "\r\n");
+//                            }
+//                            eventCounter = -1;
+//                        }
+//                    });
+//                }
+//            };
+//
+//            if (val[2] < -10.0f) {
+//                bounceCount++;
+//
 //            }
-        }
+//
+//            if (val[2] < -10.0f && eventCounter == -1) {
+//                eventCounter = 1;
+//                Timer timer = new Timer("timer1");
+//                timer.schedule(task, 2000);
+//
+//                Log.d("Counter", "Counter Loaded");
+//            } else if (val[2] < -10.0f && eventCounter != -1) {
+//                // Log.d("TAG", Float.toString(val[2]));
+//                eventCounter++;
+//
+//
+//                // Log.d("TAG", "2");
+//            }
+//
+////            if(val[2] < -15.0f && (System.currentTimeMillis()/1000) - now > 3 ){
+////                t.setText(R.string.light_drop_response);
+////                sendNotification();
+////            }
+//        }
 
     }
 
@@ -407,35 +380,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 setFaceAndMessage(below_half_battery_face, getString(R.string.battery_below_half));
                 //remove the greeting button
                 setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE, View.VISIBLE);
-                loggingBattery("Battery_below_half");
-
                 break;
             case BatteryCheckService.BATTERY_POWER_LOW:
                 setFaceAndMessage(low_battery_face, getString(R.string.battery_low));
                 //remove the greeting button
                 setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE, View.VISIBLE);
-                loggingBattery("Battery_Power_Low");
-
-
                 break;
             case BatteryCheckService.BATTERY_POWER_VERY_LOW:
 
                 //remove the greeting button
                 setFaceAndMessage(very_low_battery_face, getString(R.string.battery_very_low));
                 setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE, View.VISIBLE);
-                loggingBattery("Battery_Power_Very_Low ");
-
-
                 break;
             case BatteryCheckService.BATTERY_POWER_CHARGING:
 
                 setFaceAndMessage(battery_charging_face, getString(R.string.battery_charging));
                 //t2.setText(R.string.battery_charging_face);
                 setButtonVisibility(View.INVISIBLE, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
-                //loggingBattery("Battery_Power_Charging");
-
-
-
                 break;
             default:
 
@@ -452,9 +413,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //retrieve the date and create the payload of the data
         String[] cur_day = get_day();
 
-            String payload = cur_day[0] + " - the message is: " + message;
+            String payload = cur_day[0] + ": " + message;
             //write the data to the txt of that day
-            generateNoteOnSD(getApplicationContext(), "Battery-Messages-From-Main- " + (cur_day[1] + ".txt"), payload + "\r\n");
+            generateNoteOnSD(getApplicationContext(), "Battery-Messages-" + (cur_day[1] + ".txt"), payload + "\r\n");
 
 
     }

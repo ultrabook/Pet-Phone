@@ -138,7 +138,6 @@ public class BatteryCheckService extends Service {
             boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
                     status == BatteryManager.BATTERY_STATUS_FULL;
             Log.i("BatteryInfo", "Battery is charging: " + isCharging);
-            Log.i("Date"+DateFormat.getDateTimeInstance(), "Battery charging: "+ isCharging);
 
 
             int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
