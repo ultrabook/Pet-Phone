@@ -9,7 +9,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
@@ -148,7 +147,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null) {
             mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-            Log.d("STAT", "SUCCESS");
+           // Log.d("STAT", "SUCCESS");
+            Log.e("STAT", "Linear acceleration exists");
+        }
+        else
+        {
+            Log.e("Sensor", "FATAL ERROR: No linear acceleration exists");
+        }
+
+
+
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        if (mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
+            mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            Log.e("STAT", "Normal accelerometer exists");
+        }
+        else
+        {
+            Log.e("Sensor", "FATAL ERROR: No normal accelerometer exists");
         }
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);

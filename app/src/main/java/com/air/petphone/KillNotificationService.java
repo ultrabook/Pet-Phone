@@ -34,6 +34,7 @@ public class KillNotificationService extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
+        stopForeground(true);
         NotificationManager nManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
         nManager.cancelAll();
     }
