@@ -31,6 +31,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MAINLOCK");
         wl.acquire();
 
-        setFaceAndMessage(helloFace, "Hello");
+        setFaceAndMessage(helloFace, "Hello!");
 
         startService(new Intent(this, KillNotificationService.class));
 
