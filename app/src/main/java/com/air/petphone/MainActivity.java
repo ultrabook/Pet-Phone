@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals(Intent.ACTION_POWER_CONNECTED)) {
+            if (action.equals(Intent.ACTION_POWER_CONNECTED) && (currentBatteryMessage.equals(BatteryCheckService.BATTERY_POWER_LOW) ||  currentBatteryMessage.equals(BatteryCheckService.BATTERY_POWER_VERY_LOW))) {
                 Log.i("Plug", "plugged");
                 NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Took you long enough!", "Sorry that it took so long!");
                 batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_CHARGING);
