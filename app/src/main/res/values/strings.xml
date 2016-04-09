@@ -9,8 +9,9 @@
     <string name="greeting">Howdy!</string>
     <string name="eating_s">Omnomnom...</string>
     <string name="eating_m">Sorry! Here you go!</string>
-    <string name="battery_below_half">Getting kind of hungry</string>
+    <string name="wakeup">Sorry! Just checking something...</string>
     <string name="hungry">Hungry...</string>
+    <string name="battery_below_half">Getting kind of hungry</string>
     <string name="battery_below_half_face">0_____0""</string>
     <string name="battery_low">Feed me please</string>
     <string name="battery_low_face">\@_____@</string>

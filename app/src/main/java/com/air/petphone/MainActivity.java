@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     NotificationCenter.sendNotification(131, MainActivity.this, MainActivity.class, ">___>", "Can't you see I'm sleeping?", "Oops! Sorry..");
                     //set the sleepy face
                     setFaceAndMessage(sleepy_face, "Zzzz...");
+                    setButtonVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.VISIBLE);
 
                     unlockCounter = 0;
                 }
@@ -154,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Intent monitorIntent = new Intent(this, BatteryCheckService.class);
         startService(monitorIntent);
 
-        setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
+        setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
 
         registerReceiver(batteryReceiver,new IntentFilter(BatteryCheckService.BATTERY_UI_UPDATE));
         registerReceiver(screenReceiver, new IntentFilter(Intent.ACTION_USER_PRESENT));
@@ -296,13 +297,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return output;
     }
 
+    public void wakeup(View view) {
+        setFaceAndMessage(helloFace, getString(R.string.hello));
+        Toast.makeText(getApplicationContext(), "Fine!", Toast.LENGTH_SHORT).show();
+        setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
+    }
+
     public void saySorry(View view) {
         setFaceAndMessage(helloFace, getString(R.string.hello));
 
         Toast.makeText(getApplicationContext(), "You better be sorry >__<", Toast.LENGTH_SHORT).show();
 
         //null is no change
-        setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
+        setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
 
         batteryLevelFaceDisplay(currentBatteryMessage);
         //---log the apology to the phone --//
@@ -317,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void cantFeedYou(View view) {
 
         setFaceAndMessage(unamused_face, getString(R.string.hungry));
-        setButtonVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.VISIBLE);
+        setButtonVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
         //Display the phones response to your denial
         Toast.makeText(getApplicationContext(), "But Im so hungry...", Toast.LENGTH_SHORT).show();
 
@@ -332,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void nice2m(View view) {
 
         setFaceAndMessage(helloFace, getString(R.string.hello));
-        setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
+        setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
 
         Toast.makeText(getApplicationContext(), "Nice to meet you =^.^=", Toast.LENGTH_SHORT).show();
     }
@@ -344,7 +351,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setFaceAndMessage(helloFace, getString(R.string.hello));
         //Display phone gratitude
         Toast.makeText(getApplicationContext(), "Thank you for the food!", Toast.LENGTH_SHORT).show();
-        setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
+        setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
 
 
     }
@@ -379,30 +386,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             case BatteryCheckService.BATTERY_POWER_BELOW_HALF:
                 setFaceAndMessage(below_half_battery_face, getString(R.string.battery_below_half));
                 //remove the greeting button
-                setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE, View.VISIBLE);
+                setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
                 break;
             case BatteryCheckService.BATTERY_POWER_LOW:
                 setFaceAndMessage(low_battery_face, getString(R.string.battery_low));
                 //remove the greeting button
-                setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE, View.VISIBLE);
+                setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
                 break;
             case BatteryCheckService.BATTERY_POWER_VERY_LOW:
 
                 //remove the greeting button
                 setFaceAndMessage(very_low_battery_face, getString(R.string.battery_very_low));
-                setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE, View.VISIBLE);
+                setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
                 break;
             case BatteryCheckService.BATTERY_POWER_CHARGING:
 
                 setFaceAndMessage(battery_charging_face, getString(R.string.battery_charging));
                 //t2.setText(R.string.battery_charging_face);
-                setButtonVisibility(View.INVISIBLE, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
+                setButtonVisibility(View.INVISIBLE, View.INVISIBLE, View.VISIBLE, View.INVISIBLE, View.INVISIBLE);
                 break;
             default:
 
                 setFaceAndMessage(helloFace, getString(R.string.hello));
                 //Show hi button
-                setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
+                setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
 
                 break;
         }
@@ -475,12 +482,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         t2.setText(face);
     }
 
-    private void setButtonVisibility(Integer hi, Integer sorry, Integer eating, Integer cantFeed) {
+    private void setButtonVisibility(Integer hi, Integer sorry, Integer eating, Integer cantFeed, Integer wakeup) {
 
         Button btnSorry = (Button) findViewById(R.id.sorryButton);
         Button btnHi = (Button) findViewById(R.id.hiButton);
         Button btnEating = (Button) findViewById(R.id.eatingButton);
         Button btnCantFeed = (Button) findViewById(R.id.cantFeed);
+        Button btnWakeup = (Button) findViewById(R.id.wakeupButton);
 
 
         //set visibility if not null
@@ -492,7 +500,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (eating != null) btnEating.setVisibility(eating);
         //cant feed button
         if (cantFeed != null) btnCantFeed.setVisibility(cantFeed);
-
+        if(btnWakeup != null) btnWakeup.setVisibility(wakeup);
     }
 
 }

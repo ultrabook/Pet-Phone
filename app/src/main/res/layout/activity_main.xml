@@ -61,6 +61,16 @@
         android:layout_centerHorizontal="true" />
 
     <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/wakeup"
+        android:layout_marginTop="135dp"
+        android:id="@+id/wakeupButton"
+        android:onClick="wakeup"
+        android:layout_below="@+id/face"
+        android:layout_centerHorizontal="true" />
+
+    <Button
         android:id="@+id/cantFeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
