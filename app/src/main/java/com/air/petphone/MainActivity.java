@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MAINLOCK");
         wl.acquire();
 
-        setFaceAndMessage(helloFace, "Hello");
+        setFaceAndMessage(helloFace, "Hello!");
 
         startService(new Intent(this, KillNotificationService.class));
 
@@ -234,18 +234,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             };
 
-            if (val[2] < -10.0f) {
+            if (val[2] < -10.0f || val[1]< -8.0f || val[1] > 8.0f || val[0]< -8.0f || val[0] > 8.0f ) {
                 bounceCount++;
 
             }
 
-            if (val[2] < -10.0f && eventCounter == -1) {
+            if ((val[2] < -10.0f || val[1]< -8.0f || val[1] > 8.0f || val[0]< -8.0f || val[0] > 8.0f) && eventCounter == -1) {
                 eventCounter = 1;
                 Timer timer = new Timer("timer1");
                 timer.schedule(task, 2000);
 
                 Log.d("Counter", "Counter Loaded");
-            } else if (val[2] < -10.0f && eventCounter != -1) {
+            } else if ((val[2] < -10.0f || val[1]< -8.0f || val[1] > 8.0f || val[0]< -8.0f || val[0] > 8.0f) && eventCounter != -1) {
                 // Log.d("TAG", Float.toString(val[2]));
                 eventCounter++;
 
