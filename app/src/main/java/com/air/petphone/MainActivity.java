@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if (action.equals(Intent.ACTION_POWER_CONNECTED)) {
 
                 NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Food Time!", "Sorry! More food coming");
-                if(BatteryCheckService.readBattery < 0.51) {
+                if(!currentBatteryMessage.equals(BatteryCheckService.BATTERY_POWER_OK)) {
                     batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_CHARGING);
                 }
                 //log that power was connected
