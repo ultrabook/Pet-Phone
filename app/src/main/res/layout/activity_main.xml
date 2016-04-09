@@ -32,7 +32,7 @@
         android:id="@+id/sorryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="35dp"
         android:text="@string/sorry"
         android:onClick="saySorry"
         android:layout_below="@+id/face"
@@ -46,7 +46,7 @@
         android:id="@+id/hiButton"
         android:onClick="nice2m"
         android:layout_below="@+id/face"
-        android:layout_marginTop="95dp"
+        android:layout_marginTop="80dp"
         android:layout_centerHorizontal="true"
          />
 
@@ -54,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/eating_m"
-        android:layout_marginTop="135dp"
+        android:layout_marginTop="120dp"
         android:id="@+id/eatingButton"
         android:onClick="bonAppetite"
         android:layout_below="@+id/face"
@@ -64,7 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/wakeup"
-        android:layout_marginTop="135dp"
+        android:layout_marginTop="120dp"
         android:id="@+id/wakeupButton"
         android:onClick="wakeup"
         android:layout_below="@+id/face"
@@ -75,6 +75,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/sorryHung"
+        android:layout_marginBottom="35dp"
         android:onClick="cantFeedYou"
         android:layout_below="@+id/eatingButton"
         android:layout_centerHorizontal="true"/>
