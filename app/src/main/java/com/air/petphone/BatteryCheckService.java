@@ -40,6 +40,8 @@ public class BatteryCheckService extends Service {
     private static Integer masterCounter = 10;
     private static Integer cpuCounter = 4;
 
+    public static float readBattery = (float) 1.0;
+
     Intent updateUIIntent;
     private final Handler handler = new Handler();
 
@@ -146,6 +148,7 @@ public class BatteryCheckService extends Service {
             Log.i("BatteryInfo", "Battery charge level: " + (level / (float)scale));
 
             float batteryLevel = (level / (float)scale);
+            readBattery = batteryLevel;
 
             String detail = "Getting kind of hungry";
             String title = "0____0\"\"";

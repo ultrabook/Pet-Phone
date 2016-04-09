@@ -91,8 +91,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             String action = intent.getAction();
             if (action.equals(Intent.ACTION_POWER_CONNECTED)) {
 
-                NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Food Time!", "Sorry for the wait");
-                batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_CHARGING);
+                NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Food Time!", "Sorry! More food coming");
+                if(BatteryCheckService.readBattery < 0.51) {
+                    batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_CHARGING);
+                }
                 //log that power was connected
                 loggingBattery("power_connected");
 
@@ -367,10 +369,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
        // setFaceAndMessage(eating_face, getString(R.string.eating_s));
         //set the face to be happy hello face
-        setFaceAndMessage(helloFace, getString(R.string.hello));
+        //setFaceAndMessage(helloFace, getString(R.string.hello));
         //Display phone gratitude
         Toast.makeText(getApplicationContext(), "Thank you for the food!", Toast.LENGTH_SHORT).show();
-        setButtonVisibility(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
+        setButtonVisibility(View.INVISIBLE, View.INVISIBLE, View.VISIBLE, View.INVISIBLE, View.INVISIBLE);
 
 
     }
