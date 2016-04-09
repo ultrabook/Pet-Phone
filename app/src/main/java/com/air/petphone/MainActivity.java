@@ -91,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             String action = intent.getAction();
             if (action.equals(Intent.ACTION_POWER_CONNECTED)) {
 
-                // TODO: 16-04-08 only send notification on low
                 NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Food Time!", "Sorry for the wait");
                 batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_CHARGING);
                 //log that power was connected
@@ -180,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 //        final Context c = this;
 //        val = lowPass(event.values.clone(), val);
 //        if (val[2] > 0.5f || val[2] < -0.5f || val[1] > 0.5f || val[1] < -0.5f || val[0] > 0.5f || val[0] < -0.5f) {
-//            Log.d("TAG", Float.toString(val[2]));
+////            Log.d("TAG", Float.toString(val[2]));
 //
 //            TimerTask task = new TimerTask() {
 //                @Override
@@ -191,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 //                            Log.d("TAG", "MANY COUNT " + eventCounter);
 //                            if (eventCounter < 20) {
 //                                setFaceAndMessage(light_drop_face, getString(R.string.light_drop_response));
-//                                setButtonVisibility(View.INVISIBLE, View.VISIBLE, View.INVISIBLE, View.INVISIBLE);
+//                                setButtonVisibility(View.INVISIBLE, View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
 //
 //                                NotificationCenter.sendNotification(100, c, MainActivity.class, "HEY!!", "YOU DROPPED ME!!", "Sorry for being careless with you!");
 //                                //log the bounce count in logcat
@@ -241,11 +240,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_GAME);
         eventCounter = -1;
         Log.d("TAG", "App is resumed");
+
+        Intent intent = getIntent();
+        if(intent.hasExtra(NotificationCenter.NOTIFICATION_EXTRA)) {
+            Boolean boo = intent.getBooleanExtra(NotificationCenter.NOTIFICATION_EXTRA, false);
+            Log.e("TAG", "Resume with extra: " + boo);
+
+            String[] cur_day = get_day();
+            String payload = cur_day[0] + " - Tapped on notifcation button";
+            //write the data to the txt of that day
+            generateNoteOnSD(getApplicationContext(), "Apology-Count-" + (cur_day[1] + ".txt"), payload + "\r\n");
+        }
+
+
+
 
     }
 

@@ -12,14 +12,19 @@ import android.os.PowerManager;
  */
 public final class NotificationCenter {
 
+    public static final String NOTIFICATION_EXTRA = "notification_extra";
     private NotificationCenter() {
         throw new AssertionError();
     }
 
     public static void sendNotification(int ID, Context context, Class passedClass, String title, String text, String buttonText){
         Intent intent = new Intent(context, passedClass);
+        intent.putExtra(NOTIFICATION_EXTRA, true);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        PendingIntent p = PendingIntent.getActivity(context, 0, intent, 0);
+        PendingIntent p = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Notification noti = new Notification.Builder(context)
                 .setContentTitle(title)
