@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Pet Phone</string>
-    <string name="light_drop_response">WOW!! YOU DROPPED ME!!!!</string>
+    <string name="light_drop_response">That was unpleasant</string>
     <string name="happy_face">^_____^</string>
     <string name="shocked_face">O_____O</string>
     <string name="sorry">Sorry! I won\'t do it again</string>
