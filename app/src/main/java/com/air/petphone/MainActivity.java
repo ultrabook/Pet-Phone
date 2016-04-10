@@ -31,6 +31,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -122,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
     private int bounceCount = 0;
+    private boolean forceNotification = false;
 
     protected float[] val;
     /**
@@ -140,10 +143,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Log.e("TAG", "onCREATE");
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        if (mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null) {
-            mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        if (mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
+            mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             Log.d("STAT", "SUCCESS");
+        } else {
+            Toast.makeText(this,"Sorry, your phone doesn't have accelerometer", Toast.LENGTH_LONG).show();
         }
+
+
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MAINLOCK");
@@ -176,63 +183,63 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
+    public float getAccelerationVector(){
+        return (float) Math.sqrt(val[0]*val[0]+val[1]*val[1]+val[2]*val[2]);
+    }
+
     @Override
     public void onSensorChanged(SensorEvent event) {
-//        final Context c = this;
-//        val = lowPass(event.values.clone(), val);
-//        if (val[2] > 0.5f || val[2] < -0.5f || val[1] > 0.5f || val[1] < -0.5f || val[0] > 0.5f || val[0] < -0.5f) {
-////            Log.d("TAG", Float.toString(val[2]));
-//
-//            TimerTask task = new TimerTask() {
-//                @Override
-//                public void run() {
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Log.d("TAG", "MANY COUNT " + eventCounter);
-//                            if (eventCounter < 20) {
-//                                setFaceAndMessage(light_drop_face, getString(R.string.light_drop_response));
-//                                setButtonVisibility(View.INVISIBLE, View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
-//
-//                                NotificationCenter.sendNotification(100, c, MainActivity.class, "HEY!!", "YOU DROPPED ME!!", "Sorry for being careless with you!");
-//                                //log the bounce count in logcat
-//                                Log.i("Counter", "Bounce count: " + bounceCount);
-//                                //retrieve the date and create the payload of the data
-//                                String[] cur_day = get_day();
-//                                String payload = cur_day[0] + " bounced: " + bounceCount;
-//                                //write the data to the txt of that day
-//                                generateNoteOnSD(getApplicationContext(), "Drop-count-" + (cur_day[1] + ".txt"), payload + "\r\n");
-//                            }
-//                            eventCounter = -1;
-//                        }
-//                    });
-//                }
-//            };
-//
-//            if (val[2] < -10.0f) {
-//                bounceCount++;
-//
-//            }
-//
-//            if (val[2] < -10.0f && eventCounter == -1) {
-//                eventCounter = 1;
-//                Timer timer = new Timer("timer1");
-//                timer.schedule(task, 2000);
-//
-//                Log.d("Counter", "Counter Loaded");
-//            } else if (val[2] < -10.0f && eventCounter != -1) {
-//                // Log.d("TAG", Float.toString(val[2]));
-//                eventCounter++;
-//
-//
-//                // Log.d("TAG", "2");
-//            }
-//
-////            if(val[2] < -15.0f && (System.currentTimeMillis()/1000) - now > 3 ){
-////                t.setText(R.string.light_drop_response);
-////                sendNotification();
-////            }
-//        }
+        final Context c = this;
+        val = lowPass(event.values.clone(), val);
+        float vector = getAccelerationVector();
+
+        //Log.d("Sensor", val[0] + "  "+val[1]+"  "+val[2]);
+       // Log.d("Sensor", ""+vector);
+        //if(Math.abs(val[2]) > 10){
+
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d("TAG", "MANY COUNT " + eventCounter);
+                        if ((eventCounter > 1 && eventCounter < 50) || forceNotification) {
+                            setFaceAndMessage(light_drop_face, getString(R.string.light_drop_response));
+                            setButtonVisibility(View.INVISIBLE, View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
+
+                            NotificationCenter.sendNotification(100, c, MainActivity.class, "HEY!!", "Gentle!!", " Sorry!");
+
+                            //retrieve the date and create the payload of the data
+                            String[] cur_day = get_day();
+                            String payload = cur_day[0] + ": dropped";
+                            //write the data to the txt of that day
+                            generateNoteOnSD(getApplicationContext(), "Drop-count-" + (cur_day[1] + ".txt"), payload + "\r\n");
+                        }
+                        eventCounter = -1;
+                        bounceCount = 0;
+                        forceNotification = false;
+                    }
+                });
+            }
+        };
+
+        if(vector < 2f && eventCounter == -1){
+            eventCounter = 1;
+            Log.d("Sensor", ""+vector);
+            Timer timer = new Timer("timer1");
+            timer.schedule(task, 3000);
+        }
+        else if(vector > 16f && eventCounter != -1) {
+            //Log.d("Sensor", "v: "+vector + " z: "+val[2]);
+            Log.d("Sensor", "" + vector);
+            eventCounter++;
+
+        }
+
+        if(vector >= 30f && eventCounter != -1) {
+            forceNotification = true;
+        }
 
     }
 
@@ -308,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     //Low pass filter to filter out unwanted signals
-    float ALPHA = 0.7f;
+    float ALPHA = 0.5f;
 
     protected float[] lowPass(float[] input, float[] output) {
         if (output == null) return input;

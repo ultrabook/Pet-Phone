@@ -32,7 +32,7 @@ public final class NotificationCenter {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .addAction(R.mipmap.ic_launcher, buttonText, p)
                 .setPriority(Notification.PRIORITY_MAX)
-                .setVibrate(new long[]{0, 1000, 100, 1000, 100, 1000, 100})
+                .setVibrate(new long[]{0, 1000, 100, 1000, 100})
                 .setDefaults(Notification.DEFAULT_SOUND)
                 .build();
         notificationManager.notify(ID, noti);
