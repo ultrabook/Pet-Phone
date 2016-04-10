@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             String action = intent.getAction();
             if (action.equals(Intent.ACTION_POWER_CONNECTED)) {
 
-                NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Food Time!", "Sorry! More food coming");
+                NotificationCenter.sendNotification(130, MainActivity.this, MainActivity.class, "^_____^", "Food Time!", "Sorry it took so long!");
                 if(!currentBatteryMessage.equals(BatteryCheckService.BATTERY_POWER_OK)) {
                     batteryLevelFaceDisplay(BatteryCheckService.BATTERY_POWER_CHARGING);
                 }
