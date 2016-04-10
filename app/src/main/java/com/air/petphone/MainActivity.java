@@ -122,9 +122,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final int sleepy_face = 0x1F62A;
     private static final int unamused_face = 0x1F612;
 
-
-    private int bounceCount = 0;
     private boolean forceNotification = false;
+    private boolean hasPendingDropApology = false;
 
     protected float[] val;
     /**
@@ -215,9 +214,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             String payload = cur_day[0] + ": dropped";
                             //write the data to the txt of that day
                             generateNoteOnSD(getApplicationContext(), "Drop-count-" + (cur_day[1] + ".txt"), payload + "\r\n");
+                            hasPendingDropApology = true;
                         }
                         eventCounter = -1;
-                        bounceCount = 0;
                         forceNotification = false;
                     }
                 });
@@ -332,6 +331,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void saySorry(View view) {
+        hasPendingDropApology = false;
         setFaceAndMessage(helloFace, getString(R.string.hello));
 
         Toast.makeText(getApplicationContext(), "You better be sorry >__<", Toast.LENGTH_SHORT).show();
@@ -408,6 +408,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void batteryLevelFaceDisplay(String input) {
 
+        if(hasPendingDropApology) {return;}
         currentBatteryMessage = input;
 
         switch (input) {
