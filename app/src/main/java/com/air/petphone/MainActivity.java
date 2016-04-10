@@ -415,18 +415,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             case BatteryCheckService.BATTERY_POWER_BELOW_HALF:
                 setFaceAndMessage(below_half_battery_face, getString(R.string.battery_below_half));
                 //remove the greeting button
-                setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
+                setButtonVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
                 break;
             case BatteryCheckService.BATTERY_POWER_LOW:
                 setFaceAndMessage(low_battery_face, getString(R.string.battery_low));
                 //remove the greeting button
-                setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
+                setButtonVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
                 break;
             case BatteryCheckService.BATTERY_POWER_VERY_LOW:
 
                 //remove the greeting button
                 setFaceAndMessage(very_low_battery_face, getString(R.string.battery_very_low));
-                setButtonVisibility(View.INVISIBLE, null, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
+                setButtonVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
                 break;
             case BatteryCheckService.BATTERY_POWER_CHARGING:
 
